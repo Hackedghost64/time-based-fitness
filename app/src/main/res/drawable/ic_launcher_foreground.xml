@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Adaptive icon foreground: onset dark-tile toggle mark
+  Canvas: 108dp × 108dp
+  Toggle: 48dp wide × 24dp tall, centred at (54,54)
+  Pill path: M cx-straightHalf,top  L cx+straightHalf,top  A r,r 0 0 1 cx+straightHalf,bottom  L cx-straightHalf,bottom  A r,r 0 0 1 cx-straightHalf,top  Z
+    r = 12 (= height/2), straight section = 48 - 2*12 = 24dp
+  Colours:
+    track border : #F0EDE6  (warm white)
+    track fill   : #1C1C1A  (matches bg — border illusion)
+    knob         : #C8956C  (amber)
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Outer pill (white border), 48×24dp, centre (54,54) -->
+    <!-- left semicircle centre (42,54), right semicircle centre (66,54), r=12 -->
+    <path
+        android:pathData="M 42,42 L 66,42 A 12,12 0 0 1 66,66 L 42,66 A 12,12 0 0 1 42,42 Z"
+        android:fillColor="#F0EDE6" />
+
+    <!-- Inner pill (dark fill, 3dp inset), 42×18dp -->
+    <!-- left centre (45,54), right centre (63,54), r=9 -->
+    <path
+        android:pathData="M 45,45 L 63,45 A 9,9 0 0 1 63,63 L 45,63 A 9,9 0 0 1 45,45 Z"
+        android:fillColor="#1C1C1A" />
+
+    <!-- Amber knob — right/ON side, radius 9, centre (63,54) -->
+    <path
+        android:pathData="M 54,54 a 9,9 0 1 0 18,0 a 9,9 0 1 0 -18,0"
+        android:fillColor="#C8956C" />
+
+</vector>
