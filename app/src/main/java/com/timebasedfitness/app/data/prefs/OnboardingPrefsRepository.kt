@@ -17,14 +17,25 @@ class OnboardingPrefsRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private val KEY_HAS_ONBOARDED = booleanPreferencesKey("has_onboarded")
+    private val KEY_IS_24_HOUR = booleanPreferencesKey("is_24_hour")
 
     val hasOnboarded: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[KEY_HAS_ONBOARDED] ?: false
     }
 
+    val is24Hour: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[KEY_IS_24_HOUR] ?: false
+    }
+
     suspend fun setHasOnboarded(completed: Boolean) {
         context.dataStore.edit { preferences ->
             preferences[KEY_HAS_ONBOARDED] = completed
+        }
+    }
+
+    suspend fun setIs24Hour(value: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_IS_24_HOUR] = value
         }
     }
 }

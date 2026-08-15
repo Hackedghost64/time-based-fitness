@@ -12,6 +12,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,6 +33,7 @@ fun OnboardingScreen(
     onOnboardingComplete: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
+    var activePicker by remember { mutableStateOf<PickerTarget?>(null) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -124,11 +128,25 @@ fun OnboardingScreen(
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
-                            Text(
-                                text = "${selection.startTime.format(formatter)} - ${selection.endTime.format(formatter)}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = accentColor
-                            )
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = selection.startTime.format(formatter),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = accentColor,
+                                    modifier = Modifier.clickable {
+                                        activePicker = PickerTarget(selection.category, TimeEnd.START)
+                                    }
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = " - ${selection.endTime.format(formatter)}",
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = accentColor,
+                                    modifier = Modifier.clickable {
+                                        activePicker = PickerTarget(selection.category, TimeEnd.END)
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -155,5 +173,67 @@ fun OnboardingScreen(
                 )
             }
         }
+
+        activePicker?.let { target ->
+            val sel = state.selections.firstOrNull { it.category == target.category } ?: return@let
+            val current = if (target.end == TimeEnd.START) sel.startTime else sel.endTime
+            val title = "${sel.category.displayName} ${if (target.end == TimeEnd.START) "start" else "end"}"
+            TimeWindowPickerDialog(
+                initialTime = current,
+                title = title,
+                onConfirm = { newTime ->
+                    val newStart = if (target.end == TimeEnd.START) newTime else sel.startTime
+                    val newEnd = if (target.end == TimeEnd.END) newTime else sel.endTime
+                    viewModel.updateTimes(target.category, newStart, newEnd)
+                    activePicker = null
+                },
+                onDismiss = { activePicker = null }
+            )
+        }
     }
+}
+
+private enum class TimeEnd { START, END }
+
+private data class PickerTarget(
+    val category: Category,
+    val end: TimeEnd
+)
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun TimeWindowPickerDialog(
+    initialTime: LocalTime,
+    title: String,
+    onConfirm: (LocalTime) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val pickerState = rememberTimePickerState(
+        initialHour = initialTime.hour,
+        initialMinute = initialTime.minute,
+        is24Hour = false
+    )
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            TimePicker(state = pickerState)
+        },
+        confirmButton = {
+            TextButton(onClick = { onConfirm(LocalTime.of(pickerState.hour, pickerState.minute)) }) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
 }
