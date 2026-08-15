@@ -1,0 +1,378 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:2:1-23:12
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:2:1-23:12
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:2:1-23:12
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:2:1-23:12
+MERGED from [androidx.hilt:hilt-navigation-compose:1.2.0] /home/divyam/.gradle/caches/transforms-4/0b7568bcb31641c5e89b8c088dca315a/transformed/hilt-navigation-compose-1.2.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.hilt:hilt-navigation:1.2.0] /home/divyam/.gradle/caches/transforms-4/301b73c4f592d04b00b0d96fb62b2e89/transformed/hilt-navigation-1.2.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-common:2.7.7] /home/divyam/.gradle/caches/transforms-4/04cdcaa245989567756a73879c614be3/transformed/navigation-common-2.7.7/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.navigation:navigation-runtime:2.7.7] /home/divyam/.gradle/caches/transforms-4/b7147ce4f2428e43eb8636116aa784d9/transformed/navigation-runtime-2.7.7/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.navigation:navigation-common-ktx:2.7.7] /home/divyam/.gradle/caches/transforms-4/287ed407ee38ee85ddc18f76ddb015c5/transformed/navigation-common-ktx-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /home/divyam/.gradle/caches/transforms-4/7733e708da9e62b86355e83f835af0d5/transformed/navigation-runtime-ktx-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.navigation:navigation-compose:2.7.7] /home/divyam/.gradle/caches/transforms-4/00fc0dc28eafcbe8771f4b47f56b96ea/transformed/navigation-compose-2.7.7/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material3:material3-android:1.2.0] /home/divyam/.gradle/caches/transforms-4/792735f4a1847d97ec20f526a4ad0ca9/transformed/material3-release/AndroidManifest.xml:17:1-22:12
+MERGED from [com.google.dagger:hilt-android:2.50] /home/divyam/.gradle/caches/transforms-4/abb8138aa2d27cf15da0bca7fe629892/transformed/hilt-android-2.50/AndroidManifest.xml:16:1-19:12
+MERGED from [androidx.fragment:fragment:1.5.1] /home/divyam/.gradle/caches/transforms-4/a07bca4c2eec79dd31e05feff42bdb12/transformed/fragment-1.5.1/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.loader:loader:1.0.0] /home/divyam/.gradle/caches/transforms-4/4d44ce41778a9827eed34641f78d0d45/transformed/loader-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.material:material-ripple-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/e399d12f3e72d69a292f1cb51aa9fdce/transformed/material-ripple-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-icons-core-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/82186ff49f4d31f98aeebd544e4a98a7/transformed/material-icons-core-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.material:material-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4fdd92cc0a576a3011c368e90bb30456/transformed/material-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-core-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4d31e6c92d40e2f0825e711dd22f08ea/transformed/animation-core-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.animation:animation-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/bdeebb2e327b0f0cd0fe2c24f62cdbbb/transformed/animation-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/9ffcd73192f8b16ee3882e69e6136025/transformed/foundation-layout-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.foundation:foundation-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/759624d73b7dff0a356a311ec50147e5/transformed/foundation-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/40165e6f4a99adfe3ca4b62f432426ee/transformed/ui-tooling-data-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-unit-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/5af25a5ba00bcf2449421bd535243684/transformed/ui-unit-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-geometry-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/42361088b6630ff9a1b2b5ee3b9fbb43/transformed/ui-geometry-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-util-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/26ccb499b2782e12fac3ec58e9a38a32/transformed/ui-util-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/b46e1119c9c49ba0a9bb39cf3384f85b/transformed/ui-tooling-preview-release/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.compose.ui:ui-graphics-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/68ade10c6303eabec184eb99d6e1f927/transformed/ui-graphics-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-text-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/c65800299843bcd0d262b5a62852b134/transformed/ui-text-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:17:1-35:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/cecc69de2f6da6ebdf8637b2b0e3986d/transformed/lifecycle-livedata-core-ktx-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] /home/divyam/.gradle/caches/transforms-4/6f04be8cf6070e069c9783f5fafbeb91/transformed/lifecycle-livedata-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] /home/divyam/.gradle/caches/transforms-4/59adbca2ca324e91965282e36243da1e/transformed/lifecycle-livedata-core-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/b6be8d06a7430165b57eec36e2eb0211/transformed/lifecycle-viewmodel-ktx-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] /home/divyam/.gradle/caches/transforms-4/6f4599b2c68c5df84dde0ec7be597c77/transformed/lifecycle-viewmodel-savedstate-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] /home/divyam/.gradle/caches/transforms-4/e30ff53c0e4730c7490af931d0f9d58f/transformed/savedstate-ktx-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/divyam/.gradle/caches/transforms-4/cb9696e753bf6f6300d79d6ba9d64c4b/transformed/savedstate-1.2.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] /home/divyam/.gradle/caches/transforms-4/277847a0e1c5ff7afc831e627b4dfa96/transformed/lifecycle-viewmodel-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] /home/divyam/.gradle/caches/transforms-4/d294ff671e143c88c155a55a32a3483a/transformed/lifecycle-runtime-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/19f4de31a9a3874e56246f6b71cddb73/transformed/lifecycle-runtime-ktx-2.7.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0] /home/divyam/.gradle/caches/transforms-4/24071f1f7dd11f9a9a65c8cd14ee4e11/transformed/lifecycle-viewmodel-compose-2.7.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/68f416cff77039837852f8eff801d2f7/transformed/ui-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:17:1-28:12
+MERGED from [androidx.activity:activity-compose:1.8.2] /home/divyam/.gradle/caches/transforms-4/e516d8cd093a29d50358189a60d2ecd6/transformed/activity-compose-1.8.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity-ktx:1.8.2] /home/divyam/.gradle/caches/transforms-4/014dc877d226789914df42a52f8fd812/transformed/activity-ktx-1.8.2/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.activity:activity:1.8.2] /home/divyam/.gradle/caches/transforms-4/d3e057ca0ea2c6756ff9508e1d631e12/transformed/activity-1.8.2/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/divyam/.gradle/caches/transforms-4/12f535389c1e92769cea35c266553665/transformed/viewpager-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.autofill:autofill:1.0.0] /home/divyam/.gradle/caches/transforms-4/e10e9dceaee03cc72b720baf2310c5cd/transformed/autofill-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.customview:customview:1.0.0] /home/divyam/.gradle/caches/transforms-4/0ac6d3ce00c90143eca3e4e7ae0fda92/transformed/customview-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:17:1-30:12
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/divyam/.gradle/caches/transforms-4/05dd5bf93c9ee5bfdf027cc4ecb4e518/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:17:1-23:12
+MERGED from [androidx.core:core-ktx:1.12.0] /home/divyam/.gradle/caches/transforms-4/7030e167a17dd5e4ee1f219950447689/transformed/core-ktx-1.12.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:17:1-31:12
+MERGED from [androidx.room:room-ktx:2.6.1] /home/divyam/.gradle/caches/transforms-4/4f50a07af0e625f5f6a85ce4d041aafa/transformed/room-ktx-2.6.1/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] /home/divyam/.gradle/caches/transforms-4/30f750b6f41896127a73259f3febc0e8/transformed/datastore-preferences-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] /home/divyam/.gradle/caches/transforms-4/197375d1f657643c56c4570921f20fc7/transformed/sqlite-framework-2.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.sqlite:sqlite:2.4.0] /home/divyam/.gradle/caches/transforms-4/1adb1fd6286851f4df650f6e11369a19/transformed/sqlite-2.4.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.datastore:datastore:1.0.0] /home/divyam/.gradle/caches/transforms-4/f63f115ff76c403fa00ab1de04fcac37/transformed/datastore-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4de2b8406a9bca239d9e351348fd521b/transformed/runtime-saveable-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.compose.runtime:runtime-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/fd8ac970f9334d816161f23e90cb4488/transformed/runtime-release/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /home/divyam/.gradle/caches/transforms-4/5c1d6410f2c46e995c408e05742e601b/transformed/annotation-experimental-1.4.0/AndroidManifest.xml:2:1-7:12
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/divyam/.gradle/caches/transforms-4/cae7254b5df215f59488fb1776bc6240/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:17:1-27:12
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/divyam/.gradle/caches/transforms-4/5280c6e740524e1bcc87dea61d20d075/transformed/core-runtime-2.2.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/divyam/.gradle/caches/transforms-4/f0422eefe38fde41003287bd9253fba0/transformed/interpolator-1.0.0/AndroidManifest.xml:17:1-22:12
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:17:1-55:12
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:17:1-33:12
+MERGED from [androidx.tracing:tracing:1.0.0] /home/divyam/.gradle/caches/transforms-4/e70133c470d6c73cab985f14c2053b0c/transformed/tracing-1.0.0/AndroidManifest.xml:17:1-24:12
+MERGED from [com.google.dagger:dagger-lint-aar:2.50] /home/divyam/.gradle/caches/transforms-4/2c8efd161e22811f91ef7a3f9e3f248e/transformed/dagger-lint-aar-2.50/AndroidManifest.xml:16:1-19:12
+	package
+		INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+	android:versionName
+		INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+	android:versionCode
+		INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:2:11-69
+application
+ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:4:5-21:19
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:4:5-21:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:23:5-33:19
+MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:22:5-26:19
+MERGED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:28:5-89
+MERGED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:23:5-29:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/divyam/.gradle/caches/transforms-4/cae7254b5df215f59488fb1776bc6240/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/divyam/.gradle/caches/transforms-4/cae7254b5df215f59488fb1776bc6240/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:24:5-25:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:23:5-53:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:25:5-31:19
+	android:extractNativeLibs
+		INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+	android:appComponentFactory
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:28:18-86
+	android:supportsRtl
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:10:9-35
+	android:label
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:8:9-41
+	android:roundIcon
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:9:9-63
+	android:icon
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:7:9-58
+	android:allowBackup
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:6:9-35
+	android:theme
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:11:9-66
+	android:name
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:5:9-44
+activity#com.timebasedfitness.app.MainActivity
+ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:12:9-20:20
+	android:exported
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:14:13-36
+	android:theme
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:15:13-70
+	android:name
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:13:13-41
+intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
+ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:16:13-19:29
+action#android.intent.action.MAIN
+ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:17:17-69
+	android:name
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:17:25-66
+category#android.intent.category.LAUNCHER
+ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:18:17-77
+	android:name
+		ADDED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml:18:27-74
+uses-sdk
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+MERGED from [androidx.hilt:hilt-navigation-compose:1.2.0] /home/divyam/.gradle/caches/transforms-4/0b7568bcb31641c5e89b8c088dca315a/transformed/hilt-navigation-compose-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.hilt:hilt-navigation-compose:1.2.0] /home/divyam/.gradle/caches/transforms-4/0b7568bcb31641c5e89b8c088dca315a/transformed/hilt-navigation-compose-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.hilt:hilt-navigation:1.2.0] /home/divyam/.gradle/caches/transforms-4/301b73c4f592d04b00b0d96fb62b2e89/transformed/hilt-navigation-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.hilt:hilt-navigation:1.2.0] /home/divyam/.gradle/caches/transforms-4/301b73c4f592d04b00b0d96fb62b2e89/transformed/hilt-navigation-1.2.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-common:2.7.7] /home/divyam/.gradle/caches/transforms-4/04cdcaa245989567756a73879c614be3/transformed/navigation-common-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-common:2.7.7] /home/divyam/.gradle/caches/transforms-4/04cdcaa245989567756a73879c614be3/transformed/navigation-common-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-runtime:2.7.7] /home/divyam/.gradle/caches/transforms-4/b7147ce4f2428e43eb8636116aa784d9/transformed/navigation-runtime-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-runtime:2.7.7] /home/divyam/.gradle/caches/transforms-4/b7147ce4f2428e43eb8636116aa784d9/transformed/navigation-runtime-2.7.7/AndroidManifest.xml:20:5-44
+MERGED from [androidx.navigation:navigation-common-ktx:2.7.7] /home/divyam/.gradle/caches/transforms-4/287ed407ee38ee85ddc18f76ddb015c5/transformed/navigation-common-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-common-ktx:2.7.7] /home/divyam/.gradle/caches/transforms-4/287ed407ee38ee85ddc18f76ddb015c5/transformed/navigation-common-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /home/divyam/.gradle/caches/transforms-4/7733e708da9e62b86355e83f835af0d5/transformed/navigation-runtime-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-runtime-ktx:2.7.7] /home/divyam/.gradle/caches/transforms-4/7733e708da9e62b86355e83f835af0d5/transformed/navigation-runtime-ktx-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-compose:2.7.7] /home/divyam/.gradle/caches/transforms-4/00fc0dc28eafcbe8771f4b47f56b96ea/transformed/navigation-compose-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.navigation:navigation-compose:2.7.7] /home/divyam/.gradle/caches/transforms-4/00fc0dc28eafcbe8771f4b47f56b96ea/transformed/navigation-compose-2.7.7/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material3:material3-android:1.2.0] /home/divyam/.gradle/caches/transforms-4/792735f4a1847d97ec20f526a4ad0ca9/transformed/material3-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material3:material3-android:1.2.0] /home/divyam/.gradle/caches/transforms-4/792735f4a1847d97ec20f526a4ad0ca9/transformed/material3-release/AndroidManifest.xml:20:5-44
+MERGED from [com.google.dagger:hilt-android:2.50] /home/divyam/.gradle/caches/transforms-4/abb8138aa2d27cf15da0bca7fe629892/transformed/hilt-android-2.50/AndroidManifest.xml:18:3-42
+MERGED from [com.google.dagger:hilt-android:2.50] /home/divyam/.gradle/caches/transforms-4/abb8138aa2d27cf15da0bca7fe629892/transformed/hilt-android-2.50/AndroidManifest.xml:18:3-42
+MERGED from [androidx.fragment:fragment:1.5.1] /home/divyam/.gradle/caches/transforms-4/a07bca4c2eec79dd31e05feff42bdb12/transformed/fragment-1.5.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.fragment:fragment:1.5.1] /home/divyam/.gradle/caches/transforms-4/a07bca4c2eec79dd31e05feff42bdb12/transformed/fragment-1.5.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.loader:loader:1.0.0] /home/divyam/.gradle/caches/transforms-4/4d44ce41778a9827eed34641f78d0d45/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.loader:loader:1.0.0] /home/divyam/.gradle/caches/transforms-4/4d44ce41778a9827eed34641f78d0d45/transformed/loader-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/e399d12f3e72d69a292f1cb51aa9fdce/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-ripple-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/e399d12f3e72d69a292f1cb51aa9fdce/transformed/material-ripple-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/82186ff49f4d31f98aeebd544e4a98a7/transformed/material-icons-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-icons-core-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/82186ff49f4d31f98aeebd544e4a98a7/transformed/material-icons-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4fdd92cc0a576a3011c368e90bb30456/transformed/material-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.material:material-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4fdd92cc0a576a3011c368e90bb30456/transformed/material-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4d31e6c92d40e2f0825e711dd22f08ea/transformed/animation-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-core-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4d31e6c92d40e2f0825e711dd22f08ea/transformed/animation-core-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/bdeebb2e327b0f0cd0fe2c24f62cdbbb/transformed/animation-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.animation:animation-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/bdeebb2e327b0f0cd0fe2c24f62cdbbb/transformed/animation-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/9ffcd73192f8b16ee3882e69e6136025/transformed/foundation-layout-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-layout-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/9ffcd73192f8b16ee3882e69e6136025/transformed/foundation-layout-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/759624d73b7dff0a356a311ec50147e5/transformed/foundation-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.foundation:foundation-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/759624d73b7dff0a356a311ec50147e5/transformed/foundation-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/40165e6f4a99adfe3ca4b62f432426ee/transformed/ui-tooling-data-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-data-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/40165e6f4a99adfe3ca4b62f432426ee/transformed/ui-tooling-data-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/5af25a5ba00bcf2449421bd535243684/transformed/ui-unit-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-unit-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/5af25a5ba00bcf2449421bd535243684/transformed/ui-unit-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/42361088b6630ff9a1b2b5ee3b9fbb43/transformed/ui-geometry-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-geometry-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/42361088b6630ff9a1b2b5ee3b9fbb43/transformed/ui-geometry-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/26ccb499b2782e12fac3ec58e9a38a32/transformed/ui-util-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-util-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/26ccb499b2782e12fac3ec58e9a38a32/transformed/ui-util-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/b46e1119c9c49ba0a9bb39cf3384f85b/transformed/ui-tooling-preview-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-preview-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/b46e1119c9c49ba0a9bb39cf3384f85b/transformed/ui-tooling-preview-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/68ade10c6303eabec184eb99d6e1f927/transformed/ui-graphics-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-graphics-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/68ade10c6303eabec184eb99d6e1f927/transformed/ui-graphics-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/c65800299843bcd0d262b5a62852b134/transformed/ui-text-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-text-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/c65800299843bcd0d262b5a62852b134/transformed/ui-text-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/cecc69de2f6da6ebdf8637b2b0e3986d/transformed/lifecycle-livedata-core-ktx-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/cecc69de2f6da6ebdf8637b2b0e3986d/transformed/lifecycle-livedata-core-ktx-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] /home/divyam/.gradle/caches/transforms-4/6f04be8cf6070e069c9783f5fafbeb91/transformed/lifecycle-livedata-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata:2.7.0] /home/divyam/.gradle/caches/transforms-4/6f04be8cf6070e069c9783f5fafbeb91/transformed/lifecycle-livedata-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] /home/divyam/.gradle/caches/transforms-4/59adbca2ca324e91965282e36243da1e/transformed/lifecycle-livedata-core-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-livedata-core:2.7.0] /home/divyam/.gradle/caches/transforms-4/59adbca2ca324e91965282e36243da1e/transformed/lifecycle-livedata-core-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/b6be8d06a7430165b57eec36e2eb0211/transformed/lifecycle-viewmodel-ktx-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/b6be8d06a7430165b57eec36e2eb0211/transformed/lifecycle-viewmodel-ktx-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] /home/divyam/.gradle/caches/transforms-4/6f4599b2c68c5df84dde0ec7be597c77/transformed/lifecycle-viewmodel-savedstate-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-savedstate:2.7.0] /home/divyam/.gradle/caches/transforms-4/6f4599b2c68c5df84dde0ec7be597c77/transformed/lifecycle-viewmodel-savedstate-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] /home/divyam/.gradle/caches/transforms-4/e30ff53c0e4730c7490af931d0f9d58f/transformed/savedstate-ktx-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate-ktx:1.2.1] /home/divyam/.gradle/caches/transforms-4/e30ff53c0e4730c7490af931d0f9d58f/transformed/savedstate-ktx-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/divyam/.gradle/caches/transforms-4/cb9696e753bf6f6300d79d6ba9d64c4b/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.savedstate:savedstate:1.2.1] /home/divyam/.gradle/caches/transforms-4/cb9696e753bf6f6300d79d6ba9d64c4b/transformed/savedstate-1.2.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] /home/divyam/.gradle/caches/transforms-4/277847a0e1c5ff7afc831e627b4dfa96/transformed/lifecycle-viewmodel-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel:2.7.0] /home/divyam/.gradle/caches/transforms-4/277847a0e1c5ff7afc831e627b4dfa96/transformed/lifecycle-viewmodel-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] /home/divyam/.gradle/caches/transforms-4/d294ff671e143c88c155a55a32a3483a/transformed/lifecycle-runtime-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime:2.7.0] /home/divyam/.gradle/caches/transforms-4/d294ff671e143c88c155a55a32a3483a/transformed/lifecycle-runtime-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/19f4de31a9a3874e56246f6b71cddb73/transformed/lifecycle-runtime-ktx-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-runtime-ktx:2.7.0] /home/divyam/.gradle/caches/transforms-4/19f4de31a9a3874e56246f6b71cddb73/transformed/lifecycle-runtime-ktx-2.7.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0] /home/divyam/.gradle/caches/transforms-4/24071f1f7dd11f9a9a65c8cd14ee4e11/transformed/lifecycle-viewmodel-compose-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0] /home/divyam/.gradle/caches/transforms-4/24071f1f7dd11f9a9a65c8cd14ee4e11/transformed/lifecycle-viewmodel-compose-2.7.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/68f416cff77039837852f8eff801d2f7/transformed/ui-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/68f416cff77039837852f8eff801d2f7/transformed/ui-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity-compose:1.8.2] /home/divyam/.gradle/caches/transforms-4/e516d8cd093a29d50358189a60d2ecd6/transformed/activity-compose-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-compose:1.8.2] /home/divyam/.gradle/caches/transforms-4/e516d8cd093a29d50358189a60d2ecd6/transformed/activity-compose-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.8.2] /home/divyam/.gradle/caches/transforms-4/014dc877d226789914df42a52f8fd812/transformed/activity-ktx-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity-ktx:1.8.2] /home/divyam/.gradle/caches/transforms-4/014dc877d226789914df42a52f8fd812/transformed/activity-ktx-1.8.2/AndroidManifest.xml:5:5-44
+MERGED from [androidx.activity:activity:1.8.2] /home/divyam/.gradle/caches/transforms-4/d3e057ca0ea2c6756ff9508e1d631e12/transformed/activity-1.8.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.activity:activity:1.8.2] /home/divyam/.gradle/caches/transforms-4/d3e057ca0ea2c6756ff9508e1d631e12/transformed/activity-1.8.2/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/divyam/.gradle/caches/transforms-4/12f535389c1e92769cea35c266553665/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.viewpager:viewpager:1.0.0] /home/divyam/.gradle/caches/transforms-4/12f535389c1e92769cea35c266553665/transformed/viewpager-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.autofill:autofill:1.0.0] /home/divyam/.gradle/caches/transforms-4/e10e9dceaee03cc72b720baf2310c5cd/transformed/autofill-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.autofill:autofill:1.0.0] /home/divyam/.gradle/caches/transforms-4/e10e9dceaee03cc72b720baf2310c5cd/transformed/autofill-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.customview:customview:1.0.0] /home/divyam/.gradle/caches/transforms-4/0ac6d3ce00c90143eca3e4e7ae0fda92/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview:1.0.0] /home/divyam/.gradle/caches/transforms-4/0ac6d3ce00c90143eca3e4e7ae0fda92/transformed/customview-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/divyam/.gradle/caches/transforms-4/05dd5bf93c9ee5bfdf027cc4ecb4e518/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.customview:customview-poolingcontainer:1.0.0] /home/divyam/.gradle/caches/transforms-4/05dd5bf93c9ee5bfdf027cc4ecb4e518/transformed/customview-poolingcontainer-1.0.0/AndroidManifest.xml:20:5-21:38
+MERGED from [androidx.core:core-ktx:1.12.0] /home/divyam/.gradle/caches/transforms-4/7030e167a17dd5e4ee1f219950447689/transformed/core-ktx-1.12.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.core:core-ktx:1.12.0] /home/divyam/.gradle/caches/transforms-4/7030e167a17dd5e4ee1f219950447689/transformed/core-ktx-1.12.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:21:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] /home/divyam/.gradle/caches/transforms-4/4f50a07af0e625f5f6a85ce4d041aafa/transformed/room-ktx-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.room:room-ktx:2.6.1] /home/divyam/.gradle/caches/transforms-4/4f50a07af0e625f5f6a85ce4d041aafa/transformed/room-ktx-2.6.1/AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] /home/divyam/.gradle/caches/transforms-4/30f750b6f41896127a73259f3febc0e8/transformed/datastore-preferences-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore-preferences:1.0.0] /home/divyam/.gradle/caches/transforms-4/30f750b6f41896127a73259f3febc0e8/transformed/datastore-preferences-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] /home/divyam/.gradle/caches/transforms-4/197375d1f657643c56c4570921f20fc7/transformed/sqlite-framework-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite-framework:2.4.0] /home/divyam/.gradle/caches/transforms-4/197375d1f657643c56c4570921f20fc7/transformed/sqlite-framework-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] /home/divyam/.gradle/caches/transforms-4/1adb1fd6286851f4df650f6e11369a19/transformed/sqlite-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.sqlite:sqlite:2.4.0] /home/divyam/.gradle/caches/transforms-4/1adb1fd6286851f4df650f6e11369a19/transformed/sqlite-2.4.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.datastore:datastore:1.0.0] /home/divyam/.gradle/caches/transforms-4/f63f115ff76c403fa00ab1de04fcac37/transformed/datastore-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.datastore:datastore:1.0.0] /home/divyam/.gradle/caches/transforms-4/f63f115ff76c403fa00ab1de04fcac37/transformed/datastore-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4de2b8406a9bca239d9e351348fd521b/transformed/runtime-saveable-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-saveable-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/4de2b8406a9bca239d9e351348fd521b/transformed/runtime-saveable-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/fd8ac970f9334d816161f23e90cb4488/transformed/runtime-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.compose.runtime:runtime-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/fd8ac970f9334d816161f23e90cb4488/transformed/runtime-release/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /home/divyam/.gradle/caches/transforms-4/5c1d6410f2c46e995c408e05742e601b/transformed/annotation-experimental-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.annotation:annotation-experimental:1.4.0] /home/divyam/.gradle/caches/transforms-4/5c1d6410f2c46e995c408e05742e601b/transformed/annotation-experimental-1.4.0/AndroidManifest.xml:5:5-44
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/divyam/.gradle/caches/transforms-4/cae7254b5df215f59488fb1776bc6240/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.versionedparcelable:versionedparcelable:1.1.1] /home/divyam/.gradle/caches/transforms-4/cae7254b5df215f59488fb1776bc6240/transformed/versionedparcelable-1.1.1/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/divyam/.gradle/caches/transforms-4/5280c6e740524e1bcc87dea61d20d075/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.arch.core:core-runtime:2.2.0] /home/divyam/.gradle/caches/transforms-4/5280c6e740524e1bcc87dea61d20d075/transformed/core-runtime-2.2.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/divyam/.gradle/caches/transforms-4/f0422eefe38fde41003287bd9253fba0/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.interpolator:interpolator:1.0.0] /home/divyam/.gradle/caches/transforms-4/f0422eefe38fde41003287bd9253fba0/transformed/interpolator-1.0.0/AndroidManifest.xml:20:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:21:5-44
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:21:5-23:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/divyam/.gradle/caches/transforms-4/e70133c470d6c73cab985f14c2053b0c/transformed/tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [androidx.tracing:tracing:1.0.0] /home/divyam/.gradle/caches/transforms-4/e70133c470d6c73cab985f14c2053b0c/transformed/tracing-1.0.0/AndroidManifest.xml:20:5-22:41
+MERGED from [com.google.dagger:dagger-lint-aar:2.50] /home/divyam/.gradle/caches/transforms-4/2c8efd161e22811f91ef7a3f9e3f248e/transformed/dagger-lint-aar-2.50/AndroidManifest.xml:18:3-42
+MERGED from [com.google.dagger:dagger-lint-aar:2.50] /home/divyam/.gradle/caches/transforms-4/2c8efd161e22811f91ef7a3f9e3f248e/transformed/dagger-lint-aar-2.50/AndroidManifest.xml:18:3-42
+	android:targetSdkVersion
+		INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/divyam/fitness/time-based-fitness/app/src/main/AndroidManifest.xml
+provider#androidx.startup.InitializationProvider
+ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:24:9-32:20
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+MERGED from [androidx.startup:startup-runtime:1.1.1] /home/divyam/.gradle/caches/transforms-4/71ef99400d8a262426b9fccbcf4208e9/transformed/startup-runtime-1.1.1/AndroidManifest.xml:26:9-30:34
+	tools:node
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:28:13-31
+	android:authorities
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:26:13-68
+	android:exported
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:27:13-37
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:25:13-67
+meta-data#androidx.emoji2.text.EmojiCompatInitializer
+ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.emoji2:emoji2:1.3.0] /home/divyam/.gradle/caches/transforms-4/ad9de8654ecbde289c0b3ae7da070817/transformed/emoji2-1.3.0/AndroidManifest.xml:30:17-75
+meta-data#androidx.lifecycle.ProcessLifecycleInitializer
+ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.lifecycle:lifecycle-process:2.7.0] /home/divyam/.gradle/caches/transforms-4/ffd61369c5bd26b9aec0700b1438c1a2/transformed/lifecycle-process-2.7.0/AndroidManifest.xml:30:17-78
+activity#androidx.compose.ui.tooling.PreviewActivity
+ADDED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:23:9-25:39
+	android:exported
+		ADDED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:25:13-36
+	android:name
+		ADDED from [androidx.compose.ui:ui-tooling-android:1.6.1] /home/divyam/.gradle/caches/transforms-4/1c0732ecfc76d26bb8d3b904ddc7f5fe/transformed/ui-tooling-release/AndroidManifest.xml:24:13-71
+permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:23:9-81
+permission#com.timebasedfitness.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:22:5-24:47
+	android:protectionLevel
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:24:9-44
+	android:name
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:23:9-81
+uses-permission#${applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:26:22-94
+uses-permission#com.timebasedfitness.app.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION
+ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:26:5-97
+	android:name
+		ADDED from [androidx.core:core:1.12.0] /home/divyam/.gradle/caches/transforms-4/ec3ac7e010fe3d0d2e6c5059dd4e14c3/transformed/core-1.12.0/AndroidManifest.xml:26:22-94
+service#androidx.room.MultiInstanceInvalidationService
+ADDED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:24:9-28:63
+	android:exported
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:27:13-37
+	tools:ignore
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:28:13-60
+	android:directBootAware
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:26:13-43
+	android:name
+		ADDED from [androidx.room:room-runtime:2.6.1] /home/divyam/.gradle/caches/transforms-4/5f47f8baf7002b47bc0d67948c7663fb/transformed/room-runtime-2.6.1/AndroidManifest.xml:25:13-74
+meta-data#androidx.profileinstaller.ProfileInstallerInitializer
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:29:13-31:52
+	android:value
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:31:17-49
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:30:17-85
+receiver#androidx.profileinstaller.ProfileInstallReceiver
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:34:9-52:20
+	android:enabled
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:37:13-35
+	android:exported
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:38:13-36
+	android:permission
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:39:13-57
+	android:directBootAware
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:36:13-44
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:35:13-76
+intent-filter#action:name:androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:40:13-42:29
+action#androidx.profileinstaller.action.INSTALL_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:17-91
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:41:25-88
+intent-filter#action:name:androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:43:13-45:29
+action#androidx.profileinstaller.action.SKIP_FILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:17-85
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:44:25-82
+intent-filter#action:name:androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:46:13-48:29
+action#androidx.profileinstaller.action.SAVE_PROFILE
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:17-88
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:47:25-85
+intent-filter#action:name:androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:49:13-51:29
+action#androidx.profileinstaller.action.BENCHMARK_OPERATION
+ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:17-95
+	android:name
+		ADDED from [androidx.profileinstaller:profileinstaller:1.3.0] /home/divyam/.gradle/caches/transforms-4/c1e6b2117e0df56b8547d024c927f8c9/transformed/profileinstaller-1.3.0/AndroidManifest.xml:50:25-92

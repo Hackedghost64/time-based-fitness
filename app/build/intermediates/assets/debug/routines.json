@@ -1,0 +1,37 @@
+{
+  "MORNING": {
+    "title": "Morning Routine",
+    "steps": [
+      "Hydrate with 500ml water",
+      "Light 5-min mobility stretch",
+      "10 deep belly breaths",
+      "Healthy protein-rich breakfast"
+    ]
+  },
+  "MEALS": {
+    "title": "Breakfast & Fuel",
+    "steps": [
+      "Balanced meal with whole foods",
+      "Stay hydrated",
+      "Avoid heavy processed sugars"
+    ]
+  },
+  "WORKOUT": {
+    "title": "Today's Training",
+    "steps": [
+      "5-min dynamic warm-up",
+      "Core exercise set (3x12 reps)",
+      "Bodyweight or resistance main movement",
+      "Cool-down static stretch"
+    ]
+  },
+  "EVENING": {
+    "title": "Evening Recovery",
+    "steps": [
+      "Dim screens 1hr before bed",
+      "5-min gentle hamstring & hip stretch",
+      "Review today's wins",
+      "Sleep environment temperature check"
+    ]
+  }
+}
