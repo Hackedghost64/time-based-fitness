@@ -12,10 +12,11 @@ import javax.inject.Singleton
 class ContentRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+    private val json = Json { ignoreUnknownKeys = true }
     private val routinesMap: Map<String, RoutineContent> by lazy {
         try {
             val jsonString = context.assets.open("routines.json").bufferedReader().use { it.readText() }
-            Json.decodeFromString<Map<String, RoutineContent>>(jsonString)
+            json.decodeFromString<Map<String, RoutineContent>>(jsonString)
         } catch (e: Exception) {
             Log.e("ContentRepository", "Failed to load default routines from assets", e)
             emptyMap()

@@ -2,9 +2,12 @@ package com.timebasedfitness.app.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.timebasedfitness.app.data.content.RoutineContent
+import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.model.CategorySelection
 import com.timebasedfitness.app.data.repository.CategoryRepository
 import com.timebasedfitness.app.data.repository.CompletionRepository
+import com.timebasedfitness.app.data.repository.RoutineRepository
 import com.timebasedfitness.app.domain.WindowMatcher
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.LocalTime
@@ -18,15 +21,41 @@ import kotlinx.coroutines.flow.stateIn
 
 sealed interface HomeUiState {
     object Loading : HomeUiState
-    data class Content(val activeCategories: List<CategorySelection>, val nextUpcoming: CategorySelection?, val streakCount: Int) : HomeUiState
+    data class Content(
+        val activeCategories: List<CategorySelection>,
+        val nextUpcoming: CategorySelection?,
+        val streakCount: Int,
+        val routineContentMap: Map<Category, RoutineContent?> = emptyMap()
+    ) : HomeUiState
 }
 
 @HiltViewModel
-class HomeViewModel @Inject constructor(categoryRepository: CategoryRepository, completionRepository: CompletionRepository) : ViewModel() {
-    val uiState: StateFlow<HomeUiState> = combine(categoryRepository.categorySelections, completionRepository.currentStreak, minuteTicker()) { selections, streak, _ ->
+class HomeViewModel @Inject constructor(
+    categoryRepository: CategoryRepository,
+    completionRepository: CompletionRepository,
+    routineRepository: RoutineRepository
+) : ViewModel() {
+
+    private val allRoutinesFlow = combine(
+        Category.entries.map { cat -> routineRepository.observe(cat) }
+    ) { contents ->
+        Category.entries.zip(contents).toMap()
+    }
+
+    val uiState: StateFlow<HomeUiState> = combine(
+        categoryRepository.categorySelections,
+        completionRepository.currentStreak,
+        allRoutinesFlow,
+        minuteTicker()
+    ) { selections, streak, routineMap, _ ->
         val now = LocalTime.now()
         val active = WindowMatcher.getMatchingCategories(now, selections)
-        HomeUiState.Content(active, if (active.isEmpty()) WindowMatcher.getNextUpcoming(now, selections) else null, streak)
+        HomeUiState.Content(
+            activeCategories = active,
+            nextUpcoming = if (active.isEmpty()) WindowMatcher.getNextUpcoming(now, selections) else null,
+            streakCount = streak,
+            routineContentMap = routineMap
+        )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState.Loading)
 
     private fun minuteTicker() = flow {
@@ -39,3 +68,4 @@ class HomeViewModel @Inject constructor(categoryRepository: CategoryRepository, 
         }
     }
 }
+

@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.timebasedfitness.app.data.content.RoutineContent
 import com.timebasedfitness.app.data.model.Category
+import com.timebasedfitness.app.data.model.RoutineStep
 import com.timebasedfitness.app.data.repository.CompletionRepository
 import com.timebasedfitness.app.data.repository.RoutineRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,15 +18,25 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class ActiveTimer(
+    val stepIndex: Int,
+    val remainingSeconds: Int,
+    val totalSeconds: Int,
+    val isRunning: Boolean
+)
+
 data class RoutineDetailUiState(
     val category: Category? = null,
     val routineContent: RoutineContent? = null,
     val checkedSteps: Set<Int> = emptySet(),
+    val activeTimer: ActiveTimer? = null,
+    val completedTimerIndex: Int? = null,
     val isCompleted: Boolean = false,
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val editTitle: String = "",
-    val editSteps: List<String> = emptyList()
+    val editGoal: String = "",
+    val editSteps: List<RoutineStep> = emptyList()
 )
 
 @HiltViewModel
@@ -38,6 +51,8 @@ class RoutineDetailViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(RoutineDetailUiState())
     val uiState: StateFlow<RoutineDetailUiState> = _uiState.asStateFlow()
 
+    private var timerJob: Job? = null
+
     init {
         val category = categoryParam?.let {
             try { Category.valueOf(it) } catch (e: Exception) { null }
@@ -51,6 +66,7 @@ class RoutineDetailViewModel @Inject constructor(
                             state.copy(
                                 routineContent = content,
                                 editTitle = content?.title.orEmpty(),
+                                editGoal = content?.goal.orEmpty(),
                                 editSteps = content?.steps.orEmpty()
                             )
                         }
@@ -71,6 +87,78 @@ class RoutineDetailViewModel @Inject constructor(
         }
     }
 
+    fun startTimer(stepIndex: Int, totalSeconds: Int) {
+        val currentTimer = _uiState.value.activeTimer
+        val remaining = if (currentTimer != null && currentTimer.stepIndex == stepIndex) {
+            currentTimer.remainingSeconds
+        } else {
+            totalSeconds
+        }
+
+        timerJob?.cancel()
+        _uiState.update {
+            it.copy(
+                activeTimer = ActiveTimer(
+                    stepIndex = stepIndex,
+                    remainingSeconds = remaining,
+                    totalSeconds = totalSeconds,
+                    isRunning = true
+                ),
+                completedTimerIndex = null
+            )
+        }
+
+        timerJob = viewModelScope.launch {
+            var currentRemaining = remaining
+            while (currentRemaining > 0) {
+                delay(1000L)
+                currentRemaining--
+                val finalRem = currentRemaining
+                _uiState.update { state ->
+                    state.activeTimer?.let { timer ->
+                        if (timer.stepIndex == stepIndex) {
+                            state.copy(activeTimer = timer.copy(remainingSeconds = finalRem))
+                        } else state
+                    } ?: state
+                }
+            }
+
+            // Auto-complete step when timer reaches zero!
+            _uiState.update { state ->
+                val newChecked = state.checkedSteps + stepIndex
+                state.copy(
+                    checkedSteps = newChecked,
+                    activeTimer = null,
+                    completedTimerIndex = stepIndex
+                )
+            }
+        }
+    }
+
+    fun pauseTimer() {
+        timerJob?.cancel()
+        _uiState.update { state ->
+            state.activeTimer?.let { timer ->
+                state.copy(activeTimer = timer.copy(isRunning = false))
+            } ?: state
+        }
+    }
+
+    fun resetTimer(stepIndex: Int, totalSeconds: Int) {
+        timerJob?.cancel()
+        _uiState.update { state ->
+            state.copy(
+                activeTimer = ActiveTimer(
+                    stepIndex = stepIndex,
+                    remainingSeconds = totalSeconds,
+                    totalSeconds = totalSeconds,
+                    isRunning = false
+                ),
+                completedTimerIndex = null
+            )
+        }
+    }
+
     fun markDone(onDone: () -> Unit) {
         if (_uiState.value.isCompleted) return
         val category = _uiState.value.category ?: return
@@ -83,7 +171,14 @@ class RoutineDetailViewModel @Inject constructor(
 
     fun startEditing() {
         val content = _uiState.value.routineContent ?: return
-        _uiState.update { it.copy(isEditing = true, editTitle = content.title, editSteps = content.steps) }
+        _uiState.update {
+            it.copy(
+                isEditing = true,
+                editTitle = content.title,
+                editGoal = content.goal.orEmpty(),
+                editSteps = content.steps
+            )
+        }
     }
 
     fun cancelEditing() {
@@ -91,13 +186,28 @@ class RoutineDetailViewModel @Inject constructor(
     }
 
     fun updateTitle(title: String) = _uiState.update { it.copy(editTitle = title.take(120)) }
+    fun updateGoal(goal: String) = _uiState.update { it.copy(editGoal = goal.take(120)) }
 
-    fun updateStep(index: Int, value: String) = _uiState.update { state ->
-        state.copy(editSteps = state.editSteps.mapIndexed { i, step -> if (i == index) value.take(500) else step })
+    fun updateStepText(index: Int, value: String) = _uiState.update { state ->
+        state.copy(editSteps = state.editSteps.mapIndexed { i, step ->
+            if (i == index) RoutineStep.fromText(value.take(500), step.group) else step
+        })
+    }
+
+    fun updateStepDuration(index: Int, durationSeconds: Int) = _uiState.update { state ->
+        state.copy(editSteps = state.editSteps.mapIndexed { i, step ->
+            if (i == index) step.copy(durationSeconds = durationSeconds.coerceIn(0, 7200)) else step
+        })
+    }
+
+    fun updateStepGroup(index: Int, group: String) = _uiState.update { state ->
+        state.copy(editSteps = state.editSteps.mapIndexed { i, step ->
+            if (i == index) step.copy(group = group.take(40)) else step
+        })
     }
 
     fun addStep() = _uiState.update {
-        if (it.editSteps.size >= 100) it else it.copy(editSteps = it.editSteps + "")
+        if (it.editSteps.size >= 100) it else it.copy(editSteps = it.editSteps + RoutineStep("", 0, "Tasks"))
     }
 
     fun removeStep(index: Int) = _uiState.update { state ->
@@ -107,11 +217,11 @@ class RoutineDetailViewModel @Inject constructor(
     fun saveEditing() {
         val category = _uiState.value.category ?: return
         val title = _uiState.value.editTitle.trim().take(120)
+        val goal = _uiState.value.editGoal.trim().takeIf(String::isNotEmpty)
         val steps = _uiState.value.editSteps
-            .map(String::trim)
-            .filter(String::isNotEmpty)
+            .filter { it.text.isNotBlank() }
             .take(100)
-            .map { it.take(500) }
+            .map { it.copy(text = it.text.trim().take(500)) }
         if (title.isEmpty() || steps.isEmpty()) return
 
         val existingDays = _uiState.value.routineContent?.stepsByDay.orEmpty()
@@ -124,7 +234,7 @@ class RoutineDetailViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            routineRepository.save(category, RoutineContent(title, steps, updatedDays))
+            routineRepository.save(category, RoutineContent(title, steps, updatedDays, goal))
             _uiState.update { it.copy(isEditing = false, isSaving = false) }
         }
     }

@@ -1,6 +1,7 @@
 package com.timebasedfitness.app.data.content
 
 import com.timebasedfitness.app.data.model.Category
+import com.timebasedfitness.app.data.model.RoutineStep
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -11,6 +12,7 @@ import java.util.Locale
 data class FitnessPlanJson(
     val schemaVersion: Int = 1,
     val title: String = "Imported Fitness Plan",
+    val description: String? = null,
     val categories: List<PlanCategoryJson>
 )
 
@@ -18,11 +20,12 @@ data class FitnessPlanJson(
 data class PlanCategoryJson(
     val category: String,
     val title: String,
+    val goal: String? = null,
     val startTime: String? = null,
     val endTime: String? = null,
-    val steps: List<String> = emptyList(),
-    /** Optional ISO weekday routines, for example {"MONDAY": ["..." ]}. */
-    val days: Map<String, List<String>> = emptyMap()
+    val steps: List<RoutineStep> = emptyList(),
+    /** Optional ISO weekday routines, for example {"MONDAY": [{"text": "Bench Press", "durationSeconds": 60}]}. */
+    val days: Map<String, List<RoutineStep>> = emptyMap()
 )
 
 object PlanJsonCodec {
@@ -50,15 +53,15 @@ object PlanJsonCodec {
 
             require(item.title.isNotBlank() && item.title.length <= 120) { "A routine title is invalid." }
             require(item.steps.isNotEmpty() || item.days.values.any { it.isNotEmpty() }) { "Each routine needs 1–100 steps." }
-            require(item.steps.size <= 100 && item.steps.all { it.isNotBlank() && it.length <= 500 }) { "A routine step is invalid." }
+            require(item.steps.size <= 100 && item.steps.all { it.text.isNotBlank() && it.text.length <= 500 }) { "A routine step is invalid." }
 
-            val normalizedDays = mutableMapOf<String, List<String>>()
+            val normalizedDays = mutableMapOf<String, List<RoutineStep>>()
             for ((dayKey, daySteps) in item.days) {
                 val mappedDay = mapWeekday(dayKey) ?: continue
-                require(daySteps.isNotEmpty() && daySteps.size <= 100 && daySteps.all { step -> step.isNotBlank() && step.length <= 500 }) {
+                require(daySteps.isNotEmpty() && daySteps.size <= 100 && daySteps.all { step -> step.text.isNotBlank() && step.text.length <= 500 }) {
                     "A daily routine step for $mappedDay is invalid."
                 }
-                normalizedDays[mappedDay] = daySteps
+                normalizedDays[mappedDay] = daySteps.map { it.copy(text = it.text.trim()) }.filter { it.text.isNotEmpty() }
             }
 
             val normalizedStart = item.startTime?.let { raw ->
@@ -74,9 +77,10 @@ object PlanJsonCodec {
                 item.copy(
                     category = mappedCategory.name,
                     title = item.title.trim(),
+                    goal = item.goal?.trim()?.takeIf(String::isNotEmpty),
                     startTime = normalizedStart,
                     endTime = normalizedEnd,
-                    steps = item.steps.map(String::trim).filter(String::isNotEmpty),
+                    steps = item.steps.map { it.copy(text = it.text.trim()) }.filter { it.text.isNotEmpty() },
                     days = normalizedDays
                 )
             )
@@ -88,6 +92,7 @@ object PlanJsonCodec {
 
         return plan.copy(
             title = plan.title.trim(),
+            description = plan.description?.trim()?.takeIf(String::isNotEmpty),
             categories = normalizedCategories
         )
     }

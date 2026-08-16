@@ -23,6 +23,8 @@ import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import com.timebasedfitness.app.data.model.RoutineStep
+
 @Singleton
 class RoutineRepository @Inject constructor(
     private val dao: RoutineDao,
@@ -66,7 +68,7 @@ class RoutineRepository @Inject constructor(
 
         return database.withTransaction {
             parsedItems.forEach { (category, item, _) ->
-                val stepsJson = encodeSteps(RoutineContent(item.title, item.steps, item.days))
+                val stepsJson = encodeSteps(RoutineContent(item.title, item.steps, item.days, item.goal))
                 dao.upsert(
                     RoutineEntity(
                         category = category,
@@ -107,18 +109,21 @@ class RoutineRepository @Inject constructor(
             val startTime = schedule?.startTime?.format(formatter)
             val endTime = schedule?.endTime?.format(formatter)
             overrides[category]?.let { entity ->
+                val envelope = decodeEnvelope(entity.stepsJson)
                 PlanCategoryJson(
                     category = category.name,
                     title = entity.title,
+                    goal = envelope.goal,
                     startTime = startTime,
                     endTime = endTime,
-                    steps = decodeSteps(entity.stepsJson),
-                    days = decodeStepsByDay(entity.stepsJson)
+                    steps = envelope.steps,
+                    days = envelope.days
                 )
             } ?: contentRepository.getRoutine(category)?.let { content ->
                 PlanCategoryJson(
                     category = category.name,
                     title = content.title,
+                    goal = content.goal,
                     startTime = startTime,
                     endTime = endTime,
                     steps = content.steps,
@@ -130,22 +135,32 @@ class RoutineRepository @Inject constructor(
     }
 
     private fun contentForToday(entity: RoutineEntity): RoutineContent {
-        val daily = decodeStepsByDay(entity.stepsJson)
-        val today = daily[java.time.LocalDate.now().dayOfWeek.name]
-        return RoutineContent(entity.title, today ?: decodeSteps(entity.stepsJson), daily)
+        val envelope = decodeEnvelope(entity.stepsJson)
+        val today = envelope.days[java.time.LocalDate.now().dayOfWeek.name]
+        return RoutineContent(entity.title, today ?: envelope.steps, envelope.days, envelope.goal)
     }
 
-    private fun encodeSteps(content: RoutineContent): String =
-        if (content.stepsByDay.isEmpty()) JSONArray(content.steps).toString()
-        else Json.encodeToString(StepsEnvelope(content.steps, content.stepsByDay))
+    private fun encodeSteps(content: RoutineContent): String {
+        val envelope = StepsEnvelope(content.steps, content.stepsByDay, content.goal)
+        return json.encodeToString(envelope)
+    }
 
-    private fun decodeSteps(json: String): List<String> = runCatching {
-        Json.decodeFromString<List<String>>(json)
-    }.getOrElse { runCatching { Json.decodeFromString<StepsEnvelope>(json).steps }.getOrDefault(emptyList()) }
+    private fun decodeEnvelope(jsonStr: String): StepsEnvelope = runCatching {
+        json.decodeFromString<StepsEnvelope>(jsonStr)
+    }.getOrElse {
+        // Fallback for legacy string lists: ["Step 1", "Step 2"]
+        val legacySteps = runCatching {
+            json.decodeFromString<List<String>>(jsonStr).map { RoutineStep.fromText(it) }
+        }.getOrDefault(emptyList())
+        StepsEnvelope(legacySteps, emptyMap(), null)
+    }
 
-    private fun decodeStepsByDay(json: String): Map<String, List<String>> =
-        runCatching { Json.decodeFromString<StepsEnvelope>(json).days }.getOrDefault(emptyMap())
+    private val json = Json { ignoreUnknownKeys = true; prettyPrint = false }
 
     @kotlinx.serialization.Serializable
-    private data class StepsEnvelope(val steps: List<String> = emptyList(), val days: Map<String, List<String>> = emptyMap())
+    private data class StepsEnvelope(
+        val steps: List<RoutineStep> = emptyList(),
+        val days: Map<String, List<RoutineStep>> = emptyMap(),
+        val goal: String? = null
+    )
 }
