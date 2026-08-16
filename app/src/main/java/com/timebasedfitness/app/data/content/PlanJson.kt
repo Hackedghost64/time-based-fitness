@@ -34,7 +34,8 @@ object PlanJsonCodec {
     fun encode(plan: FitnessPlanJson): String = json.encodeToString(plan)
 
     fun decode(raw: String): Result<FitnessPlanJson> = runCatching {
-        val decoded = json.decodeFromString<FitnessPlanJson>(raw)
+        val cleaned = JsonCleaner.repair(raw)
+        val decoded = json.decodeFromString<FitnessPlanJson>(cleaned)
         normalizeAndValidate(decoded)
     }
 
@@ -151,5 +152,31 @@ object FlexibleTimeParser {
             } catch (_: Exception) {}
         }
         return null
+    }
+}
+
+object JsonCleaner {
+    fun repair(raw: String): String {
+        var text = raw.trim()
+        // Strip markdown code fences if present
+        if (text.startsWith("```")) {
+            text = text.substringAfter("\n")
+        }
+        if (text.endsWith("```")) {
+            text = text.substringBeforeLast("```")
+        }
+        text = text.trim()
+
+        // Extract JSON object if surrounded by extra conversational text
+        val firstBrace = text.indexOf('{')
+        val lastBrace = text.lastIndexOf('}')
+        if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+            text = text.substring(firstBrace, lastBrace + 1)
+        }
+
+        // Clean trailing commas in objects or arrays: e.g. ", }" or ", ]"
+        text = text.replace(Regex(",\\s*([}\\]])"), "$1")
+
+        return text
     }
 }

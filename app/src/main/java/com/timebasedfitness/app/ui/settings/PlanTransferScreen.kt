@@ -22,6 +22,10 @@ import com.timebasedfitness.app.ui.theme.AppSpacing
 import android.widget.Toast
 import androidx.compose.ui.platform.LocalContext
 
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.collectAsState
+
 @Composable
 fun PlanTransferScreen(
     viewModel: SettingsViewModel,
@@ -29,8 +33,54 @@ fun PlanTransferScreen(
     onShare: (String) -> Unit
 ) {
     val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsState()
     var jsonText by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
+
+    // Validation & Preview Dialog
+    uiState.pendingPlanPreview?.let { previewPlan ->
+        AlertDialog(
+            onDismissRequest = { viewModel.clearPreview() },
+            title = { Text("Preview: ${previewPlan.title}") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Found ${previewPlan.categories.size} categories:", style = MaterialTheme.typography.labelMedium)
+                    previewPlan.categories.forEach { cat ->
+                        val timeStr = if (cat.startTime != null && cat.endTime != null) " (${cat.startTime} – ${cat.endTime})" else ""
+                        val goalStr = cat.goal?.let { " • $it" } ?: ""
+                        Text(
+                            "• ${cat.category}: ${cat.title}$timeStr (${cat.steps.size} steps$goalStr)",
+                            style = MaterialTheme.typography.bodySmall
+                        )
+                    }
+                    Text("Apply this plan to your routines?", style = MaterialTheme.typography.bodySmall)
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        viewModel.confirmImportPendingPlan { err ->
+                            if (err != null) {
+                                error = err
+                            } else {
+                                Toast.makeText(context, "Plan imported successfully", Toast.LENGTH_SHORT).show()
+                                jsonText = ""
+                                onBack()
+                            }
+                        }
+                    }
+                ) {
+                    Text("Confirm & Apply")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { viewModel.clearPreview() }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     Column(
         modifier = Modifier.fillMaxSize().padding(AppSpacing.marginPage),
         verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -41,10 +91,6 @@ fun PlanTransferScreen(
         OutlinedTextField(
             value = jsonText,
             onValueChange = { newValue ->
-                // Cap paste size to avoid OOM/DoS via a huge pasted string. 64 KB is
-                // generously above any plausible plan (codec caps each step at 500 chars,
-                // 4 categories * 100 steps * 500 chars ≈ 200 KB worst case, but realistic
-                // plans are a few KB). Anything larger is rejected at input time.
                 if (newValue.length <= MAX_PASTED_JSON_CHARS) {
                     jsonText = newValue
                     error = null
@@ -53,7 +99,7 @@ fun PlanTransferScreen(
                 }
             },
             modifier = Modifier.fillMaxWidth().weight(1f),
-            label = { Text("Plan JSON") }
+            label = { Text("Plan JSON (Auto-repairs markdown & quotes)") }
         )
         error?.let { Text(it, color = MaterialTheme.colorScheme.error) }
         Button(
@@ -61,19 +107,31 @@ fun PlanTransferScreen(
                 if (jsonText.length > MAX_PASTED_JSON_CHARS) {
                     error = "Plan is too large (max $MAX_PASTED_JSON_CHARS characters)."
                 } else {
-                    viewModel.importPlan(jsonText) { err ->
-                        if (err != null) {
-                            error = err
-                        } else {
-                            Toast.makeText(context, "Plan imported successfully", Toast.LENGTH_SHORT).show()
-                            jsonText = ""
-                            onBack()
-                        }
+                    viewModel.previewPlan(jsonText) { err ->
+                        if (err != null) error = err
                     }
                 }
             },
             modifier = Modifier.fillMaxWidth()
-        ) { Text("Import plan") }
+        ) { Text("Preview & Import Plan") }
+
+        if (uiState.canUndoImport) {
+            OutlinedButton(
+                onClick = {
+                    viewModel.undoLastImport { err ->
+                        if (err != null) {
+                            Toast.makeText(context, "Undo failed: $err", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Restored previous plan", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("↩ Undo Last Import")
+            }
+        }
+
         TextButton(
             onClick = { viewModel.exportPlan(onShare) },
             modifier = Modifier.fillMaxWidth()

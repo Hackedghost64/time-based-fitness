@@ -122,4 +122,34 @@ class PlanJsonCodecTest {
         assertEquals(null, decoded.categories[0].startTime)
         assertEquals(null, decoded.categories[0].endTime)
     }
+
+    @Test
+    fun decode_repairsMarkdownFencesAndTrailingCommas() {
+        val markdownJson = """
+        Here is the workout plan you requested:
+        ```json
+        {
+          "schemaVersion": 1,
+          "title": "Cleaned Plan",
+          "categories": [
+            {
+              "category": "WORKOUT",
+              "title": "Gym",
+              "steps": [
+                "Bench press",
+                "Squats",
+              ],
+            },
+          ]
+        }
+        ```
+        Enjoy your workout!
+        """.trimIndent()
+
+        val result = PlanJsonCodec.decode(markdownJson)
+        assertTrue(result.isSuccess)
+        val decoded = result.getOrThrow()
+        assertEquals("Cleaned Plan", decoded.title)
+        assertEquals(2, decoded.categories[0].steps.size)
+    }
 }

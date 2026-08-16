@@ -22,7 +22,9 @@ import android.content.Context
 
 data class SettingsUiState(
     val selections: List<CategorySelection> = emptyList(),
-    val isSaving: Boolean = false
+    val isSaving: Boolean = false,
+    val canUndoImport: Boolean = false,
+    val pendingPlanPreview: com.timebasedfitness.app.data.content.FitnessPlanJson? = null
 )
 
 @HiltViewModel
@@ -36,6 +38,7 @@ class SettingsViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
     private var isLocallyModified = false
+    private var previousPlanBackup: String? = null
 
     init {
         viewModelScope.launch {
@@ -80,17 +83,69 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun previewPlan(rawJson: String, onResult: (String?) -> Unit) {
+        val decoded = PlanJsonCodec.decode(rawJson)
+        decoded.fold(
+            onSuccess = { plan ->
+                _uiState.update { it.copy(pendingPlanPreview = plan) }
+                onResult(null)
+            },
+            onFailure = { error ->
+                onResult(error.message ?: "Invalid plan JSON")
+            }
+        )
+    }
+
+    fun clearPreview() {
+        _uiState.update { it.copy(pendingPlanPreview = null) }
+    }
+
+    fun confirmImportPendingPlan(onResult: (String?) -> Unit) {
+        val plan = _uiState.value.pendingPlanPreview ?: return
+        viewModelScope.launch {
+            try {
+                previousPlanBackup = routineRepository.exportPlan()
+                val updatedSelections = routineRepository.importPlan(plan)
+                notificationScheduler.reschedule(updatedSelections)
+                WidgetSnapshot.update(context, updatedSelections)
+                isLocallyModified = false
+                _uiState.update {
+                    it.copy(
+                        selections = updatedSelections,
+                        pendingPlanPreview = null,
+                        canUndoImport = true
+                    )
+                }
+                onResult(null)
+            } catch (e: Exception) {
+                onResult(e.message ?: "Failed to import plan")
+            }
+        }
+    }
+
+    fun undoLastImport(onResult: (String?) -> Unit) {
+        val backup = previousPlanBackup ?: return
+        importPlan(backup) { err ->
+            if (err == null) {
+                previousPlanBackup = null
+                _uiState.update { it.copy(canUndoImport = false) }
+            }
+            onResult(err)
+        }
+    }
+
     fun importPlan(rawJson: String, onResult: (String?) -> Unit) {
         val decoded = PlanJsonCodec.decode(rawJson)
         decoded.fold(
             onSuccess = { plan ->
                 viewModelScope.launch {
                     try {
+                        previousPlanBackup = routineRepository.exportPlan()
                         val updatedSelections = routineRepository.importPlan(plan)
                         notificationScheduler.reschedule(updatedSelections)
                         WidgetSnapshot.update(context, updatedSelections)
                         isLocallyModified = false
-                        _uiState.update { it.copy(selections = updatedSelections) }
+                        _uiState.update { it.copy(selections = updatedSelections, canUndoImport = true) }
                         onResult(null)
                     } catch (e: Exception) {
                         onResult(e.message ?: "Failed to import plan")
