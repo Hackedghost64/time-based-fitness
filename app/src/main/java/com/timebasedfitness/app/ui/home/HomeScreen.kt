@@ -1,15 +1,15 @@
 package com.timebasedfitness.app.ui.home
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -25,180 +25,58 @@ import com.timebasedfitness.app.ui.theme.CategoryTheme
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun HomeScreen(
-    viewModel: HomeViewModel,
-    onRoutineClick: (Category) -> Unit,
-    onSettingsClick: () -> Unit
-) {
-    val uiState by viewModel.uiState.collectAsState()
-
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(AppSpacing.marginPage)
-        ) {
-            // Top Bar: Header & Streak Count & Settings
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = AppSpacing.spaceMd),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Today",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)
-                ) {
-                    if (uiState is HomeUiState.Content) {
-                        val streak = (uiState as HomeUiState.Content).streakCount
-                        Text(
-                            text = "$streak day streak",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    Text(
-                        text = "Settings",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { onSettingsClick() }
-                    )
+fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onSettingsClick: () -> Unit) {
+    val state by viewModel.uiState.collectAsState()
+    Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(Modifier.fillMaxSize().padding(AppSpacing.marginPage)) {
+            Row(Modifier.fillMaxWidth().padding(vertical = AppSpacing.spaceMd), Arrangement.SpaceBetween, Alignment.CenterVertically) {
+                Text("Today", style = MaterialTheme.typography.headlineLarge)
+                Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd), verticalAlignment = Alignment.CenterVertically) {
+                    if (state is HomeUiState.Content) Text("${(state as HomeUiState.Content).streakCount} day streak", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Text("Settings", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary, modifier = Modifier.clickable(onClick = onSettingsClick))
                 }
             }
-
-            Spacer(modifier = Modifier.height(AppSpacing.spaceLg))
-
-            AnimatedContent(
-                targetState = uiState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "home-content"
-            ) { state ->
-            when (state) {
-                is HomeUiState.Loading -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                    }
-                }
-                is HomeUiState.Content -> {
-                    if (state.activeCategories.isNotEmpty()) {
-                        LazyColumn(
-                            verticalArrangement = Arrangement.spacedBy(AppSpacing.stackGap)
-                        ) {
-                            items(state.activeCategories) { selection ->
-                                HomeCard(
-                                    selection = selection,
-                                    onClick = { onRoutineClick(selection.category) }
-                                )
-                            }
-                        }
+            Spacer(Modifier.height(AppSpacing.spaceLg))
+            AnimatedContent(state, transitionSpec = { fadeIn() togetherWith fadeOut() }, label = "home-content") { current ->
+                when (current) {
+                    HomeUiState.Loading -> Box(Modifier.fillMaxSize(), Alignment.Center) { CircularProgressIndicator() }
+                    is HomeUiState.Content -> if (current.activeCategories.isNotEmpty()) {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(AppSpacing.stackGap)) { items(current.activeCategories) { item -> HomeCard(item) { onRoutineClick(item.category) } } }
                     } else {
-                        // Quiet Empty State
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Column(
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                val next = state.nextUpcoming
-                                if (next != null) {
-                                    val formatter = DateTimeFormatter.ofPattern("hh:mm a")
-                                Text(
-                                    text = "○",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Spacer(modifier = Modifier.height(AppSpacing.spaceMd))
-                                Text(
-                                        text = "Next up: ${next.category.displayName}",
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                    Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
-                                    Text(
-                                        text = "Scheduled for ${next.startTime.format(formatter)}",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                } else {
-                                    Text(
-                                        text = "Nothing scheduled right now.",
-                                        style = MaterialTheme.typography.headlineMedium,
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
-                                    Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
-                                    Text(
-                                        text = "Set up category windows in Settings.",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+                        Box(Modifier.fillMaxSize(), Alignment.Center) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("○", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Spacer(Modifier.height(AppSpacing.spaceMd))
+                                Text(current.nextUpcoming?.let { "Next up: ${it.category.displayName}" } ?: "Nothing scheduled right now.", style = MaterialTheme.typography.titleMedium)
+                                Spacer(Modifier.height(AppSpacing.spaceSm))
+                                Text(current.nextUpcoming?.let { "Scheduled for ${it.startTime.format(DateTimeFormatter.ofPattern("hh:mm a"))}" } ?: "Set up category windows in Settings.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                         }
                     }
                 }
-            }
             }
         }
     }
 }
 
 @Composable
-fun HomeCard(
-    selection: CategorySelection,
-    onClick: () -> Unit
-) {
-    val accentColor = CategoryTheme.getAccentColor(selection.category)
+private fun HomeCard(selection: CategorySelection, onClick: () -> Unit) {
+    val accent = CategoryTheme.getAccentColor(selection.category)
     val formatter = DateTimeFormatter.ofPattern("hh:mm a")
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface,
-        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.25f))
-    ) {
-        Column(
-            modifier = Modifier.padding(AppSpacing.cardPadding)
-        ) {
-            Text(
-                text = when (selection.category) {
-                    Category.MORNING -> "☼"
-                    Category.MEALS -> "◦"
-                    Category.WORKOUT -> "＋"
-                    Category.EVENING -> "☾"
-                },
-                color = accentColor,
-                style = MaterialTheme.typography.headlineMedium
-            )
-            Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
-            Text(
-                text = selection.category.displayName,
-                style = MaterialTheme.typography.headlineLarge,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
-            Text(
-                text = "Window: ${selection.startTime.format(formatter)} - ${selection.endTime.format(formatter)}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = accentColor,
-                fontWeight = FontWeight.Medium
-            )
+    Surface(Modifier.fillMaxWidth().clickable(onClick = onClick), shape = RoundedCornerShape(16.dp), color = MaterialTheme.colorScheme.surface, border = BorderStroke(1.dp, accent.copy(alpha = 0.3f))) {
+        Column(Modifier.padding(AppSpacing.cardPadding)) {
+            Text(categoryGlyph(selection.category), color = accent, style = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.height(AppSpacing.spaceSm))
+            Text(selection.category.displayName, style = MaterialTheme.typography.titleLarge)
+            Spacer(Modifier.height(AppSpacing.spaceSm))
+            Text("Window: ${selection.startTime.format(formatter)} – ${selection.endTime.format(formatter)}", style = MaterialTheme.typography.bodySmall, color = accent, fontWeight = FontWeight.Medium)
         }
     }
+}
+
+private fun categoryGlyph(category: Category) = when (category) {
+    Category.MORNING -> "☼"
+    Category.MEALS -> "◦"
+    Category.WORKOUT -> "＋"
+    Category.EVENING -> "☾"
 }
