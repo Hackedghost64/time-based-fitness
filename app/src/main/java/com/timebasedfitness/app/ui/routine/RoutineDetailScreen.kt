@@ -24,6 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -319,14 +323,22 @@ fun RoutineDetailScreen(
                                             Surface(
                                                 shape = RoundedCornerShape(12.dp),
                                                 color = accentColor.copy(alpha = 0.08f),
-                                                border = BorderStroke(1.dp, accentColor.copy(alpha = 0.2f))
+                                                border = BorderStroke(1.dp, accentColor.copy(alpha = 0.2f)),
+                                                modifier = Modifier.semantics {
+                                                    contentDescription = "Timer for ${step.text}: $minutes minutes and $seconds seconds"
+                                                }
                                             ) {
                                                 Row(
                                                     modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp),
                                                     horizontalArrangement = Arrangement.SpaceBetween,
                                                     verticalAlignment = Alignment.CenterVertically
                                                 ) {
-                                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                                    Row(
+                                                        verticalAlignment = Alignment.CenterVertically,
+                                                        modifier = Modifier.semantics {
+                                                            liveRegion = androidx.compose.ui.semantics.LiveRegionMode.Polite
+                                                        }
+                                                    ) {
                                                         Text("⏱ ", fontSize = 16.sp)
                                                         Text(
                                                             text = timeStr,
@@ -336,34 +348,39 @@ fun RoutineDetailScreen(
                                                         )
                                                     }
 
-                                                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                                    Row(
+                                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                                        verticalAlignment = Alignment.CenterVertically
+                                                    ) {
                                                         if (isTimerActive && activeTimer?.isRunning == true) {
                                                             FilledTonalButton(
                                                                 onClick = viewModel::pauseTimer,
                                                                 shape = CircleShape,
-                                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                                                modifier = Modifier.defaultMinSize(minWidth = 72.dp, minHeight = 48.dp),
+                                                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                                                             ) {
-                                                                Text("Pause", style = MaterialTheme.typography.labelSmall)
+                                                                Text("Pause", style = MaterialTheme.typography.labelMedium)
                                                             }
                                                         } else {
                                                             Button(
                                                                 onClick = { viewModel.startTimer(index, step.durationSeconds) },
                                                                 shape = CircleShape,
                                                                 colors = ButtonDefaults.buttonColors(containerColor = accentColor),
-                                                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                                                                modifier = Modifier.defaultMinSize(minWidth = 72.dp, minHeight = 48.dp),
+                                                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
                                                             ) {
-                                                                Icon(Icons.Filled.PlayArrow, contentDescription = "Start", modifier = Modifier.size(16.dp))
+                                                                Icon(Icons.Filled.PlayArrow, contentDescription = "Start timer", modifier = Modifier.size(18.dp))
                                                                 Spacer(modifier = Modifier.width(4.dp))
-                                                                Text(if (isTimerActive) "Resume" else "Start", style = MaterialTheme.typography.labelSmall)
+                                                                Text(if (isTimerActive) "Resume" else "Start", style = MaterialTheme.typography.labelMedium)
                                                             }
                                                         }
 
                                                         if (isTimerActive) {
                                                             IconButton(
                                                                 onClick = { viewModel.resetTimer(index, step.durationSeconds) },
-                                                                modifier = Modifier.size(32.dp)
+                                                                modifier = Modifier.size(48.dp)
                                                             ) {
-                                                                Icon(Icons.Filled.Refresh, contentDescription = "Reset", tint = accentColor, modifier = Modifier.size(16.dp))
+                                                                Icon(Icons.Filled.Refresh, contentDescription = "Reset timer", tint = accentColor, modifier = Modifier.size(20.dp))
                                                             }
                                                         }
                                                     }
