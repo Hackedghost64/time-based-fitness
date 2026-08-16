@@ -13,19 +13,18 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
-import androidx.glance.unit.ColorProvider
 import androidx.compose.ui.unit.dp
-import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.action.clickable
+import androidx.glance.appwidget.action.actionStartActivity
 import com.timebasedfitness.app.MainActivity
-import com.timebasedfitness.app.R
+import com.timebasedfitness.app.ui.theme.BackgroundWarm
 
 class NowRoutineWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         val snapshot = WidgetSnapshot.read(context)
         provideContent {
             Column(
-                modifier = GlanceModifier.fillMaxSize().background(ColorProvider(R.color.widget_background)).padding(16.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
+                modifier = GlanceModifier.fillMaxSize().background(BackgroundWarm).padding(16.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
