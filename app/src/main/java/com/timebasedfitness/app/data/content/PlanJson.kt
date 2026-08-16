@@ -41,8 +41,8 @@ object PlanJsonCodec {
             require(item.title.isNotBlank() && item.title.length <= 120) { "A routine title is invalid." }
             require(item.steps.isNotEmpty() && item.steps.size <= 100) { "Each routine needs 1–100 steps." }
             require(item.steps.all { it.isNotBlank() && it.length <= 500 }) { "A routine step is invalid." }
-            item.startTime?.let { require(it.matches(Regex("^([01]\\d|2[0-3]):[0-5]\\d$")) { "Invalid start time: $it" } }
-            item.endTime?.let { require(it.matches(Regex("^([01]\\d|2[0-3]):[0-5]\\d$")) { "Invalid end time: $it" } }
+            item.startTime?.let { require(it.matches(Regex("^([01]\\d|2[0-3]):[0-5]\\d$"))) { "Invalid start time: $it" } }
+            item.endTime?.let { require(it.matches(Regex("^([01]\\d|2[0-3]):[0-5]\\d$"))) { "Invalid end time: $it" } }
         }
         require(plan.categories.map { it.category }.toSet().size == plan.categories.size) { "Categories must be unique." }
     }
