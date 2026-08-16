@@ -8,6 +8,7 @@ import com.timebasedfitness.app.data.content.RoutineContent
 import com.timebasedfitness.app.data.local.RoutineDao
 import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.model.RoutineEntity
+import org.json.JSONArray
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.Json
@@ -25,11 +26,12 @@ class RoutineRepository @Inject constructor(
     }
 
     suspend fun save(category: Category, content: RoutineContent) {
+        val stepsJson = JSONArray(content.steps).toString()
         dao.upsert(
             RoutineEntity(
                 category = category,
                 title = content.title.trim(),
-                stepsJson = Json.encodeToString(content.steps.map(String::trim).filter(String::isNotEmpty))
+                stepsJson = stepsJson
             )
         )
     }

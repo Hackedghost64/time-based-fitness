@@ -1,6 +1,7 @@
 package com.timebasedfitness.app.widget
 
 import android.content.Context
+import android.content.Intent
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.appwidget.GlanceAppWidget
@@ -13,7 +14,7 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
 import androidx.glance.unit.ColorProvider
-import androidx.glance.unit.dp
+import androidx.compose.ui.unit.dp
 import androidx.glance.appwidget.action.actionStartActivity
 import androidx.glance.action.clickable
 import com.timebasedfitness.app.MainActivity
@@ -24,7 +25,7 @@ class NowRoutineWidget : GlanceAppWidget() {
         val snapshot = WidgetSnapshot.read(context)
         provideContent {
             Column(
-                modifier = GlanceModifier.fillMaxSize().background(ColorProvider(R.color.widget_background)).padding(16.dp).clickable(actionStartActivity<MainActivity>()),
+                modifier = GlanceModifier.fillMaxSize().background(ColorProvider(R.color.widget_background)).padding(16.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))),
                 verticalAlignment = Alignment.Vertical.CenterVertically,
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
