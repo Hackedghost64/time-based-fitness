@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.prefs.OnboardingPrefsRepository
 import com.timebasedfitness.app.ui.navigation.AppNavGraph
 import com.timebasedfitness.app.ui.navigation.Screen
@@ -48,10 +49,16 @@ class MainActivity : ComponentActivity() {
                         else -> {
                             val startDestination = if (onboarded) Screen.Home else Screen.Onboarding
                             val navController = rememberNavController()
+                            // Validate EXTRA_CATEGORY against the enum before forwarding to nav.
+                            // A malformed extra (from an external Intent) would otherwise pass an
+                            // arbitrary string into the navigation graph.
+                            val initialCategory = intent.getStringExtra("category")?.let { raw ->
+                                runCatching { Category.valueOf(raw) }.getOrNull()
+                            }
                             AppNavGraph(
                                 navController = navController,
                                 startDestination = startDestination,
-                                initialCategory = intent.getStringExtra("category")
+                                initialCategory = initialCategory?.name
                             )
                         }
                     }

@@ -30,10 +30,19 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Debug builds are debuggable (allow JDWP / run-as) and use AGP's
+            // auto-generated debug signing key. Declared explicitly so that a
+            // future maintainer cannot accidentally make a release build
+            // debuggable by tweaking AGP defaults.
+            isDebuggable = true
+            isMinifyEnabled = false
+        }
         release {
             // R8 removes unused code, optimizes bytecode, and obfuscates the
             // production artifact. Keep release builds representative of what
             // will be uploaded to Google Play.
+            isDebuggable = false
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

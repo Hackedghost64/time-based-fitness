@@ -41,8 +41,15 @@ class RoutineRepository @Inject constructor(
     }
 
     suspend fun importPlan(plan: FitnessPlanJson) {
+        // Per-item isolation: a single bad row should not abort the entire import.
+        // PlanJsonCodec already enforces enum membership for `category`, but this is
+        // defense-in-depth for any future caller that constructs a FitnessPlanJson
+        // without going through the codec.
         plan.categories.forEach { item ->
-            save(Category.valueOf(item.category), RoutineContent(item.title, item.steps))
+            runCatching {
+                val category = Category.valueOf(item.category)
+                save(category, RoutineContent(item.title, item.steps))
+            }
         }
     }
 

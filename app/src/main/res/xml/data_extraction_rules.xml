@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12+ (API 31+) backup / device-transfer rules.
+  Sourced from android:dataExtractionRules in the manifest.
+
+  Decision: exclude the Room database and the widget SharedPreferences from
+  auto-backup. The fitness data is low-sensitivity but we want to keep the
+  blast radius small if a user's Google account is compromised, and the widget
+  snapshot is purely derived state that will repopulate on next launch.
+
+  Auto Backup (cloud) and Device Transfer use the same allow/exclude lists
+  here. If you ever decide to allow backup of routines (e.g. cross-device
+  sync), move "time_based_fitness.db" from <exclude> to <include>.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="database" path="time_based_fitness.db" />
+        <exclude domain="sharedpref" path="widget_snapshot.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="database" path="time_based_fitness.db" />
+        <exclude domain="sharedpref" path="widget_snapshot.xml" />
+    </device-transfer>
+</data-extraction-rules>
