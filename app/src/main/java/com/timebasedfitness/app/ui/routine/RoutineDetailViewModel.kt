@@ -19,6 +19,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+import com.timebasedfitness.app.data.model.RoutineTemplate
+import com.timebasedfitness.app.data.model.TemplateRepository
+
 data class ActiveTimer(
     val stepIndex: Int,
     val remainingSeconds: Int,
@@ -37,6 +40,8 @@ data class RoutineDetailUiState(
     val isCompleted: Boolean = false,
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
+    val selectedEditingDay: String? = null,
+    val availableTemplates: List<RoutineTemplate> = emptyList(),
     val editTitle: String = "",
     val editGoal: String = "",
     val editSteps: List<RoutineStep> = emptyList()
@@ -47,7 +52,8 @@ class RoutineDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val routineRepository: RoutineRepository,
     private val completionRepository: CompletionRepository,
-    private val timerNotificationHelper: TimerNotificationHelper
+    private val timerNotificationHelper: TimerNotificationHelper,
+    private val templateRepository: TemplateRepository
 ) : ViewModel() {
 
     private val categoryParam: String? = savedStateHandle["category"]
@@ -62,7 +68,8 @@ class RoutineDetailViewModel @Inject constructor(
             try { Category.valueOf(it) } catch (e: Exception) { null }
         }
         if (category != null) {
-            _uiState.update { it.copy(category = category) }
+            val templates = templateRepository.getTemplatesForCategory(category)
+            _uiState.update { it.copy(category = category, availableTemplates = templates) }
             viewModelScope.launch {
                 routineRepository.observe(category).collect { content ->
                     if (!_uiState.value.isEditing) {
@@ -82,6 +89,31 @@ class RoutineDetailViewModel @Inject constructor(
 
     fun toggleAutoChaining() {
         _uiState.update { it.copy(isAutoChainingEnabled = !it.isAutoChainingEnabled) }
+    }
+
+    fun selectEditingDay(day: String?) {
+        val content = _uiState.value.routineContent ?: return
+        val daySteps = if (day != null) {
+            content.stepsByDay[day] ?: content.steps
+        } else {
+            content.steps
+        }
+        _uiState.update {
+            it.copy(
+                selectedEditingDay = day,
+                editSteps = daySteps
+            )
+        }
+    }
+
+    fun applyTemplate(template: RoutineTemplate) {
+        _uiState.update {
+            it.copy(
+                editTitle = template.content.title,
+                editGoal = template.content.goal.orEmpty(),
+                editSteps = template.content.steps
+            )
+        }
     }
 
     fun toggleStep(index: Int) {
@@ -216,6 +248,7 @@ class RoutineDetailViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isEditing = true,
+                selectedEditingDay = null,
                 editTitle = content.title,
                 editGoal = content.goal.orEmpty(),
                 editSteps = content.steps
@@ -266,17 +299,21 @@ class RoutineDetailViewModel @Inject constructor(
             .map { it.copy(text = it.text.trim().take(500)) }
         if (title.isEmpty() || steps.isEmpty()) return
 
-        val existingDays = _uiState.value.routineContent?.stepsByDay.orEmpty()
-        val todayKey = java.time.LocalDate.now().dayOfWeek.name
-        val updatedDays = if (existingDays.isNotEmpty()) {
-            existingDays.toMutableMap().apply { put(todayKey, steps) }
+        val selectedDay = _uiState.value.selectedEditingDay
+        val existingContent = _uiState.value.routineContent
+        val existingDays = existingContent?.stepsByDay.orEmpty().toMutableMap()
+
+        val updatedMainSteps: List<RoutineStep>
+        if (selectedDay == null) {
+            updatedMainSteps = steps
         } else {
-            emptyMap()
+            existingDays[selectedDay] = steps
+            updatedMainSteps = existingContent?.steps ?: steps
         }
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            routineRepository.save(category, RoutineContent(title, steps, updatedDays, goal))
+            routineRepository.save(category, RoutineContent(title, updatedMainSteps, existingDays, goal))
             _uiState.update { it.copy(isEditing = false, isSaving = false) }
         }
     }

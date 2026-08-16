@@ -142,11 +142,65 @@ fun RoutineDetailScreen(
                     Spacer(modifier = Modifier.height(AppSpacing.spaceLg))
 
                     if (uiState.isEditing) {
+                        // Templates Row
+                        if (uiState.availableTemplates.isNotEmpty()) {
+                            Text("Preset Templates:", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            Spacer(modifier = Modifier.height(6.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                uiState.availableTemplates.forEach { template ->
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = accentColor.copy(alpha = 0.1f),
+                                        border = BorderStroke(1.dp, accentColor.copy(alpha = 0.3f)),
+                                        modifier = Modifier.clickable { viewModel.applyTemplate(template) }
+                                    ) {
+                                        Text(
+                                            text = "✨ ${template.name.take(16)}...",
+                                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            color = accentColor
+                                        )
+                                    }
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(14.dp))
+                        }
+
+                        // Weekday Selector Tabs
+                        Text("Editing Schedule Split:", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            val daysList = listOf(null to "All", "MONDAY" to "M", "TUESDAY" to "Tu", "WEDNESDAY" to "W", "THURSDAY" to "Th", "FRIDAY" to "F", "SATURDAY" to "Sa", "SUNDAY" to "Su")
+                            daysList.forEach { (dayKey, label) ->
+                                val isSelected = uiState.selectedEditingDay == dayKey
+                                Surface(
+                                    shape = RoundedCornerShape(8.dp),
+                                    color = if (isSelected) accentColor else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                                    modifier = Modifier.clickable { viewModel.selectEditingDay(dayKey) }
+                                ) {
+                                    Text(
+                                        text = label,
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                        color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                    )
+                                }
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(14.dp))
+
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
                             if (uiState.editSteps.isEmpty()) {
                                 item {
                                     Text(
-                                        text = "No steps added yet. Tap \"Add step\" below to create your routine.",
+                                        text = "No steps for this day. Tap \"Add step\" below to configure.",
                                         style = MaterialTheme.typography.bodyMedium,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         modifier = Modifier.padding(vertical = AppSpacing.spaceMd)
