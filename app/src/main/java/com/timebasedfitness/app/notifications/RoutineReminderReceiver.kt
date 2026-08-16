@@ -57,7 +57,7 @@ class RoutineReminderReceiver : BroadcastReceiver() {
                 val openIntent = PendingIntentFactory.openApp(context, category.name)
                 val notification = NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_launcher_foreground)
-                    .setContentTitle(context.getString(R.string.alert_ready))
+                    .setContentTitle("${category.displayName} ${context.getString(R.string.alert_ready)}")
                     .setContentText(context.getString(R.string.notification_description))
                     .setContentIntent(openIntent)
                     .setAutoCancel(true)
