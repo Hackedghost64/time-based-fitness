@@ -88,3 +88,4 @@ lint/tmp/
 
 # KSP / annotation processor generated
 app/build/generated/
+build-release.sh
