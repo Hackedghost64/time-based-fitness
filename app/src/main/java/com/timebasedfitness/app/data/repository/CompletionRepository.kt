@@ -21,6 +21,10 @@ class CompletionRepository @Inject constructor(
         StreakCalculator.calculateStreak(logs)
     }
 
+    val recentCompletedDates: Flow<Set<LocalDate>> = dao.getAllLogs().map { logs ->
+        logs.map { it.date }.toSet()
+    }
+
     suspend fun logCompletion(category: Category, date: LocalDate = LocalDate.now()) {
         val log = CompletionLog(
             date = date,

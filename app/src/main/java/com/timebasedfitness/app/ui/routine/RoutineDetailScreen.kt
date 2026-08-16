@@ -17,6 +17,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -374,13 +377,51 @@ fun RoutineDetailScreen(
                     }
                 }
 
+                var showConfirmDialog by remember { mutableStateOf(false) }
+
+                if (showConfirmDialog) {
+                    AlertDialog(
+                        onDismissRequest = { showConfirmDialog = false },
+                        title = { Text("Complete Routine?") },
+                        text = {
+                            val total = routine.steps.size
+                            val checked = uiState.checkedSteps.size
+                            Text("You've checked $checked of $total steps. Complete this routine for today?")
+                        },
+                        confirmButton = {
+                            Button(
+                                onClick = {
+                                    showConfirmDialog = false
+                                    viewModel.markDone(onBackToHome)
+                                },
+                                colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                            ) {
+                                Text("Complete")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showConfirmDialog = false }) {
+                                Text("Keep Going")
+                            }
+                        }
+                    )
+                }
+
                 if (uiState.isEditing) {
                     Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
                         OutlinedButton(onClick = viewModel::cancelEditing, modifier = Modifier.weight(1f).height(56.dp)) { Text("Cancel") }
                         Button(onClick = viewModel::saveEditing, enabled = !uiState.isSaving, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Text(if (uiState.isSaving) "Saving..." else "Save") }
                     }
                 } else Button(
-                    onClick = { viewModel.markDone(onBackToHome) },
+                    onClick = {
+                        val total = routine.steps.size
+                        val checked = uiState.checkedSteps.size
+                        if (checked < total && checked > 0) {
+                            showConfirmDialog = true
+                        } else {
+                            viewModel.markDone(onBackToHome)
+                        }
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
@@ -390,8 +431,10 @@ fun RoutineDetailScreen(
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
+                    val checkedCount = uiState.checkedSteps.size
+                    val totalCount = routine.steps.size
                     Text(
-                        text = "Done",
+                        text = if (checkedCount in 1 until totalCount) "Finish Routine ($checkedCount/$totalCount)" else "Done",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold
                     )

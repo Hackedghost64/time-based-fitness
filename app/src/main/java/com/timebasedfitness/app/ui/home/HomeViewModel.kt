@@ -19,13 +19,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 
+import java.time.LocalDate
+
 sealed interface HomeUiState {
     object Loading : HomeUiState
     data class Content(
         val activeCategories: List<CategorySelection>,
         val nextUpcoming: CategorySelection?,
         val streakCount: Int,
-        val routineContentMap: Map<Category, RoutineContent?> = emptyMap()
+        val routineContentMap: Map<Category, RoutineContent?> = emptyMap(),
+        val completedDates: Set<LocalDate> = emptySet()
     ) : HomeUiState
 }
 
@@ -45,16 +48,18 @@ class HomeViewModel @Inject constructor(
     val uiState: StateFlow<HomeUiState> = combine(
         categoryRepository.categorySelections,
         completionRepository.currentStreak,
+        completionRepository.recentCompletedDates,
         allRoutinesFlow,
         minuteTicker()
-    ) { selections, streak, routineMap, _ ->
+    ) { selections, streak, completedDates, routineMap, _ ->
         val now = LocalTime.now()
         val active = WindowMatcher.getMatchingCategories(now, selections)
         HomeUiState.Content(
             activeCategories = active,
             nextUpcoming = if (active.isEmpty()) WindowMatcher.getNextUpcoming(now, selections) else null,
             streakCount = streak,
-            routineContentMap = routineMap
+            routineContentMap = routineMap,
+            completedDates = completedDates
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState.Loading)
 

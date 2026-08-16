@@ -55,10 +55,10 @@ fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onS
                     is HomeUiState.Content -> if (current.activeCategories.isNotEmpty()) {
                         val selection = current.activeCategories.first()
                         val routine = current.routineContentMap[selection.category]
-                        Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
+                        Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             HomeCard(selection, routine, timeFormat) { onRoutineClick(selection.category) }
                             if (current.activeCategories.size > 1) Text("+${current.activeCategories.size - 1} more ready when you are", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            StreakRow(current.streakCount)
+                            QuietWeeklyHistoryRow(current.completedDates)
                         }
                     } else EmptyState(current, timeFormat)
                 }
@@ -175,6 +175,53 @@ private fun HomeCard(
     }
 }
 
+@Composable
+private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
+    val today = LocalDate.now()
+    val daysOfWeek = (6 downTo 0).map { offset -> today.minusDays(offset.toLong()) }
+
+    Surface(
+        shape = RoundedCornerShape(16.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            daysOfWeek.forEach { date ->
+                val isCompleted = completedDates.contains(date)
+                val isToday = date == today
+                val dayLabel = date.dayOfWeek.name.take(2)
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = dayLabel,
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
+                        color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Box(
+                        modifier = Modifier
+                            .size(10.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (isCompleted) MaterialTheme.colorScheme.primary
+                                else if (isToday) MaterialTheme.colorScheme.outline
+                                else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                            )
+                    )
+                }
+            }
+        }
+    }
+}
+
 @Composable private fun StreakRow(streak: Int) { if (streak > 0) Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.outlineVariant)); Spacer(Modifier.width(8.dp)); Text("$streak day streak", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
 
 @Composable private fun EmptyState(content: HomeUiState.Content, format: DateTimeFormatter) {
@@ -182,6 +229,8 @@ private fun HomeCard(
         Box(Modifier.size(56.dp).clip(CircleShape).border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape), Alignment.Center) { Box(Modifier.size(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.outlineVariant)) }
         Spacer(Modifier.height(24.dp)); Text("Nothing right now", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp)); Text(content.nextUpcoming?.let { "Next: ${it.category.displayName} at ${it.startTime.format(format).lowercase()}" } ?: "Set up category windows in Settings", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(24.dp))
+        QuietWeeklyHistoryRow(content.completedDates)
     } }
 }
 
