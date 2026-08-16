@@ -30,6 +30,12 @@ class HomeViewModel @Inject constructor(categoryRepository: CategoryRepository, 
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), HomeUiState.Loading)
 
     private fun minuteTicker() = flow {
-        while (true) { emit(Unit); delay(60_000) }
+        emit(Unit)
+        val initialDelay = 60_000L - (System.currentTimeMillis() % 60_000L)
+        delay(initialDelay)
+        while (true) {
+            emit(Unit)
+            delay(60_000L)
+        }
     }
 }

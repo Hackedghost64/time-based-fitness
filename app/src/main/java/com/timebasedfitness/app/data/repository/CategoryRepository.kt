@@ -25,26 +25,6 @@ class CategoryRepository @Inject constructor(
         dao.insertAll(selections)
     }
 
-    suspend fun applyPlanSchedules(plan: com.timebasedfitness.app.data.content.FitnessPlanJson) {
-        val existing = dao.getAllCategorySelectionsSync().ifEmpty { getDefaultSelections() }
-        // Defensively skip categories that are not in the enum. The codec's validator
-        // already rejects unknown categories, but isolating per-row keeps the existing
-        // selections intact even if a future caller bypasses the codec.
-        val byCategory = plan.categories.mapNotNull { item ->
-            runCatching { Category.valueOf(item.category) to item }.getOrNull()
-        }.toMap()
-        saveSelections(existing.map { selection ->
-            val imported = byCategory[selection.category]
-            selection.copy(
-                isEnabled = imported != null,
-                startTime = imported?.startTime?.let { raw -> runCatching { LocalTime.parse(raw) }.getOrNull() }
-                    ?: selection.startTime,
-                endTime = imported?.endTime?.let { raw -> runCatching { LocalTime.parse(raw) }.getOrNull() }
-                    ?: selection.endTime
-            )
-        })
-    }
-
     companion object {
         fun getDefaultSelections(): List<CategorySelection> {
             return listOf(

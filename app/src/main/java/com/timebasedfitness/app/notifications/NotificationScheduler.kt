@@ -59,7 +59,7 @@ class NotificationScheduler @Inject constructor(@ApplicationContext private val 
 
     fun cancelAll() {
         Category.entries.forEach { category ->
-            val intent = Intent(context, RoutineReminderReceiver::class.java)
+            val intent = Intent(context, RoutineReminderReceiver::class.java).putExtra(EXTRA_CATEGORY, category.name)
             PendingIntent.getBroadcast(
                 context,
                 category.ordinal,

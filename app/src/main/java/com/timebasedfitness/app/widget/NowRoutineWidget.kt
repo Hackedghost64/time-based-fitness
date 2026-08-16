@@ -13,11 +13,17 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.padding
 import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import androidx.glance.text.FontWeight
+import androidx.glance.unit.ColorProvider
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.dp
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.action.actionStartActivity
 import com.timebasedfitness.app.MainActivity
 import com.timebasedfitness.app.ui.theme.BackgroundWarm
+import com.timebasedfitness.app.ui.theme.TextOnSurface
+import com.timebasedfitness.app.ui.theme.TextOnSurfaceVariant
 
 class NowRoutineWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -28,8 +34,8 @@ class NowRoutineWidget : GlanceAppWidget() {
                 verticalAlignment = Alignment.Vertical.CenterVertically,
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
-                Text(snapshot.first)
-                Text(snapshot.second)
+                Text(snapshot.first, style = TextStyle(color = ColorProvider(TextOnSurface), fontSize = 18.sp, fontWeight = FontWeight.Bold))
+                Text(snapshot.second, style = TextStyle(color = ColorProvider(TextOnSurfaceVariant), fontSize = 13.sp))
             }
         }
     }

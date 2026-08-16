@@ -72,10 +72,11 @@ class RoutineDetailViewModel @Inject constructor(
     }
 
     fun markDone(onDone: () -> Unit) {
+        if (_uiState.value.isCompleted) return
         val category = _uiState.value.category ?: return
         viewModelScope.launch {
-            completionRepository.logCompletion(category)
             _uiState.update { it.copy(isCompleted = true) }
+            completionRepository.logCompletion(category)
             onDone()
         }
     }
@@ -89,13 +90,15 @@ class RoutineDetailViewModel @Inject constructor(
         _uiState.update { it.copy(isEditing = false) }
     }
 
-    fun updateTitle(title: String) = _uiState.update { it.copy(editTitle = title) }
+    fun updateTitle(title: String) = _uiState.update { it.copy(editTitle = title.take(120)) }
 
     fun updateStep(index: Int, value: String) = _uiState.update { state ->
-        state.copy(editSteps = state.editSteps.mapIndexed { i, step -> if (i == index) value else step })
+        state.copy(editSteps = state.editSteps.mapIndexed { i, step -> if (i == index) value.take(500) else step })
     }
 
-    fun addStep() = _uiState.update { it.copy(editSteps = it.editSteps + "") }
+    fun addStep() = _uiState.update {
+        if (it.editSteps.size >= 100) it else it.copy(editSteps = it.editSteps + "")
+    }
 
     fun removeStep(index: Int) = _uiState.update { state ->
         state.copy(editSteps = state.editSteps.filterIndexed { i, _ -> i != index })
@@ -103,8 +106,12 @@ class RoutineDetailViewModel @Inject constructor(
 
     fun saveEditing() {
         val category = _uiState.value.category ?: return
-        val title = _uiState.value.editTitle.trim()
-        val steps = _uiState.value.editSteps.map(String::trim).filter(String::isNotEmpty)
+        val title = _uiState.value.editTitle.trim().take(120)
+        val steps = _uiState.value.editSteps
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+            .take(100)
+            .map { it.take(500) }
         if (title.isEmpty() || steps.isEmpty()) return
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
