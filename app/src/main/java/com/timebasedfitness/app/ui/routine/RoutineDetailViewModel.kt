@@ -49,7 +49,7 @@ data class RoutineDetailUiState(
 
 @HiltViewModel
 class RoutineDetailViewModel @Inject constructor(
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val routineRepository: RoutineRepository,
     private val completionRepository: CompletionRepository,
     private val timerNotificationHelper: TimerNotificationHelper,
@@ -62,6 +62,7 @@ class RoutineDetailViewModel @Inject constructor(
     val uiState: StateFlow<RoutineDetailUiState> = _uiState.asStateFlow()
 
     private var timerJob: Job? = null
+    private var restoredTimer = false
 
     init {
         val category = categoryParam?.let {
@@ -80,6 +81,10 @@ class RoutineDetailViewModel @Inject constructor(
                                 editGoal = content?.goal.orEmpty(),
                                 editSteps = content?.steps.orEmpty()
                             )
+                        }
+                        if (!restoredTimer) {
+                            restoredTimer = true
+                            restorePersistedTimer()
                         }
                     }
                 }
@@ -135,7 +140,10 @@ class RoutineDetailViewModel @Inject constructor(
             totalSeconds
         }
 
-        val targetEnd = System.currentTimeMillis() + (remaining * 1000L)
+        startTimerAt(stepIndex, totalSeconds, remaining, System.currentTimeMillis() + (remaining * 1000L))
+    }
+
+    private fun startTimerAt(stepIndex: Int, totalSeconds: Int, remaining: Int, targetEnd: Long) {
 
         timerJob?.cancel()
         _uiState.update {
@@ -150,12 +158,14 @@ class RoutineDetailViewModel @Inject constructor(
                 completedTimerIndex = null
             )
         }
+        persistActiveTimer(_uiState.value.activeTimer)
 
         val stepName = _uiState.value.routineContent?.steps?.getOrNull(stepIndex)?.text ?: "Step ${stepIndex + 1}"
         val categoryName = _uiState.value.category?.name.orEmpty()
         timerNotificationHelper.showTimerNotification(stepName, remaining, categoryName)
 
         timerJob = viewModelScope.launch {
+            var lastNotifiedRemaining = remaining
             while (true) {
                 delay(500L)
                 val now = System.currentTimeMillis()
@@ -169,15 +179,18 @@ class RoutineDetailViewModel @Inject constructor(
                     } ?: state
                 }
 
-                if (rem > 0) {
-                    timerNotificationHelper.showTimerNotification(stepName, rem, categoryName)
-                } else {
+                if (rem == 0) {
                     break
+                }
+                if (rem != lastNotifiedRemaining) {
+                    timerNotificationHelper.showTimerNotification(stepName, rem, categoryName)
+                    lastNotifiedRemaining = rem
                 }
             }
 
             // Auto-complete step when timer reaches zero!
             timerNotificationHelper.dismiss()
+            clearPersistedTimer()
             val newChecked = _uiState.value.checkedSteps + stepIndex
             _uiState.update { state ->
                 state.copy(
@@ -209,6 +222,7 @@ class RoutineDetailViewModel @Inject constructor(
                 state.copy(activeTimer = timer.copy(isRunning = false))
             } ?: state
         }
+        persistActiveTimer(_uiState.value.activeTimer)
     }
 
     fun resetTimer(stepIndex: Int, totalSeconds: Int) {
@@ -225,12 +239,14 @@ class RoutineDetailViewModel @Inject constructor(
                 completedTimerIndex = null
             )
         }
+        persistActiveTimer(_uiState.value.activeTimer)
     }
 
     override fun onCleared() {
         super.onCleared()
         timerJob?.cancel()
-        timerNotificationHelper.dismiss()
+        // Keep a running timer's saved timestamp and notification available when the
+        // routine screen is recreated. A restored screen derives remaining time from it.
     }
 
     fun markDone(onDone: () -> Unit) {
@@ -241,6 +257,48 @@ class RoutineDetailViewModel @Inject constructor(
             completionRepository.logCompletion(category)
             onDone()
         }
+    }
+
+    private fun restorePersistedTimer() {
+        val stepIndex = savedStateHandle.get<Int>(KEY_TIMER_STEP) ?: return
+        val totalSeconds = savedStateHandle.get<Int>(KEY_TIMER_TOTAL) ?: return clearPersistedTimer()
+        val remainingSeconds = savedStateHandle.get<Int>(KEY_TIMER_REMAINING) ?: return clearPersistedTimer()
+        val isRunning = savedStateHandle.get<Boolean>(KEY_TIMER_RUNNING) ?: return clearPersistedTimer()
+        val targetEnd = savedStateHandle.get<Long>(KEY_TIMER_TARGET) ?: 0L
+        if (stepIndex < 0 || totalSeconds <= 0 || remainingSeconds <= 0) return clearPersistedTimer()
+
+        if (isRunning) {
+            val remaining = kotlin.math.max(0, ((targetEnd - System.currentTimeMillis() + 999) / 1000).toInt())
+            if (remaining == 0) return clearPersistedTimer()
+            startTimerAt(stepIndex, totalSeconds, remaining, targetEnd)
+        } else {
+            _uiState.update { it.copy(activeTimer = ActiveTimer(stepIndex, remainingSeconds, totalSeconds, isRunning = false)) }
+        }
+    }
+
+    private fun persistActiveTimer(timer: ActiveTimer?) {
+        if (timer == null) return clearPersistedTimer()
+        savedStateHandle[KEY_TIMER_STEP] = timer.stepIndex
+        savedStateHandle[KEY_TIMER_TOTAL] = timer.totalSeconds
+        savedStateHandle[KEY_TIMER_REMAINING] = timer.remainingSeconds
+        savedStateHandle[KEY_TIMER_RUNNING] = timer.isRunning
+        savedStateHandle[KEY_TIMER_TARGET] = timer.targetEndMillis
+    }
+
+    private fun clearPersistedTimer() {
+        savedStateHandle.remove<Int>(KEY_TIMER_STEP)
+        savedStateHandle.remove<Int>(KEY_TIMER_TOTAL)
+        savedStateHandle.remove<Int>(KEY_TIMER_REMAINING)
+        savedStateHandle.remove<Boolean>(KEY_TIMER_RUNNING)
+        savedStateHandle.remove<Long>(KEY_TIMER_TARGET)
+    }
+
+    private companion object {
+        const val KEY_TIMER_STEP = "active_timer_step"
+        const val KEY_TIMER_TOTAL = "active_timer_total"
+        const val KEY_TIMER_REMAINING = "active_timer_remaining"
+        const val KEY_TIMER_RUNNING = "active_timer_running"
+        const val KEY_TIMER_TARGET = "active_timer_target"
     }
 
     fun startEditing() {

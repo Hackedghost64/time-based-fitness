@@ -6,6 +6,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.Manifest
+import android.content.pm.PackageManager
+import androidx.core.content.ContextCompat
 import androidx.core.app.NotificationCompat
 import com.timebasedfitness.app.MainActivity
 import com.timebasedfitness.app.R
@@ -38,6 +41,7 @@ class TimerNotificationHelper @Inject constructor(
     }
 
     fun showTimerNotification(stepTitle: String, remainingSeconds: Int, categoryName: String) {
+        if (Build.VERSION.SDK_INT >= 33 && ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) return
         val minutes = remainingSeconds / 60
         val seconds = remainingSeconds % 60
         val timeStr = "%02d:%02d".format(minutes, seconds)
