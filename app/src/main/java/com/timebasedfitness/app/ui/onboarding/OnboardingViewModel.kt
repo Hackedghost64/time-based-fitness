@@ -14,6 +14,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import javax.inject.Inject
+import com.timebasedfitness.app.notifications.NotificationScheduler
+import com.timebasedfitness.app.widget.WidgetSnapshot
+import dagger.hilt.android.qualifiers.ApplicationContext
+import android.content.Context
 
 data class OnboardingUiState(
     val selections: List<CategorySelection> = listOf(
@@ -28,7 +32,9 @@ data class OnboardingUiState(
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val categoryRepository: CategoryRepository,
-    private val prefsRepository: OnboardingPrefsRepository
+    private val prefsRepository: OnboardingPrefsRepository,
+    private val notificationScheduler: NotificationScheduler,
+    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(OnboardingUiState())
@@ -56,6 +62,8 @@ class OnboardingViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
             categoryRepository.saveSelections(_uiState.value.selections)
+            notificationScheduler.reschedule(_uiState.value.selections)
+            WidgetSnapshot.update(context, _uiState.value.selections)
             prefsRepository.setHasOnboarded(true)
             _uiState.update { it.copy(isSaving = false) }
             onSuccess()

@@ -25,6 +25,19 @@ class CategoryRepository @Inject constructor(
         dao.insertAll(selections)
     }
 
+    suspend fun applyPlanSchedules(plan: com.timebasedfitness.app.data.content.FitnessPlanJson) {
+        val existing = dao.getAllCategorySelectionsSync().ifEmpty { getDefaultSelections() }
+        val byCategory = plan.categories.associateBy { Category.valueOf(it.category) }
+        saveSelections(existing.map { selection ->
+            val imported = byCategory[selection.category]
+            selection.copy(
+                isEnabled = imported != null,
+                startTime = imported?.startTime?.let(LocalTime::parse) ?: selection.startTime,
+                endTime = imported?.endTime?.let(LocalTime::parse) ?: selection.endTime
+            )
+        })
+    }
+
     private fun getDefaultSelections(): List<CategorySelection> {
         return listOf(
             CategorySelection(Category.MORNING, isEnabled = true, startTime = LocalTime.of(6, 0), endTime = LocalTime.of(9, 0)),

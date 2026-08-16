@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.timebasedfitness.app.data.local.AppDatabase
 import com.timebasedfitness.app.data.local.CategorySelectionDao
 import com.timebasedfitness.app.data.local.CompletionLogDao
+import com.timebasedfitness.app.data.local.RoutineDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,7 +24,11 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "time_based_fitness.db"
-        ).fallbackToDestructiveMigration().build()
+        ).addMigrations(
+            androidx.room.migration.Migration(1, 2) { database ->
+                database.execSQL("CREATE TABLE IF NOT EXISTS routines (category TEXT NOT NULL PRIMARY KEY, title TEXT NOT NULL, stepsJson TEXT NOT NULL)")
+            }
+        ).build()
     }
 
     @Provides
@@ -35,4 +40,7 @@ object DatabaseModule {
     fun provideCompletionLogDao(db: AppDatabase): CompletionLogDao {
         return db.completionLogDao()
     }
+
+    @Provides
+    fun provideRoutineDao(db: AppDatabase): RoutineDao = db.routineDao()
 }

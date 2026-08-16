@@ -62,47 +62,75 @@ fun RoutineDetailScreen(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Text(
-                        text = routine.title,
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    if (uiState.isEditing) {
+                        OutlinedTextField(
+                            value = uiState.editTitle,
+                            onValueChange = viewModel::updateTitle,
+                            modifier = Modifier.fillMaxWidth(),
+                            label = { Text("Routine title") },
+                            singleLine = true
+                        )
+                    } else {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = routine.title,
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.weight(1f)
+                            )
+                            TextButton(onClick = viewModel::startEditing) { Text("Edit") }
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)
-                    ) {
-                        itemsIndexed(routine.steps) { index, step ->
-                            val isChecked = uiState.checkedSteps.contains(index)
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable { viewModel.toggleStep(index) }
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = isChecked,
-                                    onCheckedChange = { viewModel.toggleStep(index) },
-                                    colors = CheckboxDefaults.colors(
-                                        checkedColor = accentColor,
-                                        uncheckedColor = MaterialTheme.colorScheme.outline
+                    if (uiState.isEditing) {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
+                            itemsIndexed(uiState.editSteps) { index, step ->
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    OutlinedTextField(
+                                        value = step,
+                                        onValueChange = { viewModel.updateStep(index, it) },
+                                        modifier = Modifier.weight(1f),
+                                        label = { Text("Step ${index + 1}") }
                                     )
-                                )
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Text(
-                                    text = step,
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = if (isChecked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface
-                                )
+                                    TextButton(onClick = { viewModel.removeStep(index) }) { Text("Remove") }
+                                }
+                            }
+                            item {
+                                OutlinedButton(onClick = viewModel::addStep, modifier = Modifier.fillMaxWidth()) {
+                                    Text("Add step")
+                                }
+                            }
+                        }
+                    } else {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
+                            itemsIndexed(routine.steps) { index, step ->
+                                val isChecked = uiState.checkedSteps.contains(index)
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth().clickable { viewModel.toggleStep(index) }.padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Checkbox(checked = isChecked, onCheckedChange = { viewModel.toggleStep(index) }, colors = CheckboxDefaults.colors(checkedColor = accentColor, uncheckedColor = MaterialTheme.colorScheme.outline))
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Text(text = step, style = MaterialTheme.typography.bodyLarge, color = if (isChecked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface)
+                                }
                             }
                         }
                     }
                 }
 
-                Button(
+                if (uiState.isEditing) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
+                        OutlinedButton(onClick = viewModel::cancelEditing, modifier = Modifier.weight(1f).height(56.dp)) { Text("Cancel") }
+                        Button(onClick = viewModel::saveEditing, enabled = !uiState.isSaving, modifier = Modifier.weight(1f).height(56.dp), shape = RoundedCornerShape(16.dp)) { Text(if (uiState.isSaving) "Saving..." else "Save") }
+                    }
+                } else Button(
                     onClick = { viewModel.markDone(onBackToHome) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,6 +146,11 @@ fun RoutineDetailScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold
                     )
+                }
+                if (!uiState.isEditing) {
+                    TextButton(onClick = viewModel::resetToDefault, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                        Text("Reset to default")
+                    }
                 }
             }
         }

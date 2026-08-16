@@ -14,6 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -28,10 +31,15 @@ import java.time.format.DateTimeFormatter
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
-    onBackToHome: () -> Unit
+    onBackToHome: () -> Unit,
+    onPlanTransfer: () -> Unit,
+    onAiPlan: () -> Unit
 ) {
     val state by viewModel.uiState.collectAsState()
     var activePicker by remember { mutableStateOf<PickerTarget?>(null) }
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission(), onResult = {}
+    )
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -66,6 +74,20 @@ fun SettingsScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedButton(onClick = onPlanTransfer, modifier = Modifier.fillMaxWidth()) {
+                    Text("Import or share JSON plan")
+                }
+                OutlinedButton(onClick = onAiPlan, modifier = Modifier.fillMaxWidth()) {
+                    Text("Create plan with AI")
+                }
+                if (android.os.Build.VERSION.SDK_INT >= 33) {
+                    OutlinedButton(
+                        onClick = { notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS) },
+                        modifier = Modifier.fillMaxWidth()
+                    ) { Text("Allow routine reminders") }
+                }
 
                 Spacer(modifier = Modifier.height(32.dp))
 

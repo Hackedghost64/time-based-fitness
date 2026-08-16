@@ -50,7 +50,8 @@ class MainActivity : ComponentActivity() {
                             val navController = rememberNavController()
                             AppNavGraph(
                                 navController = navController,
-                                startDestination = startDestination
+                                startDestination = startDestination,
+                                initialCategory = intent.getStringExtra("category")
                             )
                         }
                     }

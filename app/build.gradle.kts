@@ -31,7 +31,11 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // R8 removes unused code, optimizes bytecode, and obfuscates the
+            // production artifact. Keep release builds representative of what
+            // will be uploaded to Google Play.
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -81,6 +85,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.glance.appwidget)
 
     testImplementation(libs.junit)
     debugImplementation(libs.androidx.ui.tooling)

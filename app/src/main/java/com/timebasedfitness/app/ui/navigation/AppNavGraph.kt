@@ -16,12 +16,21 @@ import com.timebasedfitness.app.ui.routine.RoutineDetailScreen
 import com.timebasedfitness.app.ui.routine.RoutineDetailViewModel
 import com.timebasedfitness.app.ui.settings.SettingsScreen
 import com.timebasedfitness.app.ui.settings.SettingsViewModel
+import com.timebasedfitness.app.ui.settings.PlanTransferScreen
+import com.timebasedfitness.app.ui.settings.AiPlanScreen
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.text.AnnotatedString
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.LaunchedEffect
 
 object Screen {
     const val Onboarding = "onboarding"
     const val Home = "home"
     const val RoutineDetail = "routine/{category}"
     const val Settings = "settings"
+    const val PlanTransfer = "plan-transfer"
+    const val AiPlan = "ai-plan"
 
     fun routineDetail(category: Category) = "routine/${category.name}"
 }
@@ -29,8 +38,14 @@ object Screen {
 @Composable
 fun AppNavGraph(
     navController: NavHostController,
-    startDestination: String
+    startDestination: String,
+    initialCategory: String? = null
 ) {
+    LaunchedEffect(initialCategory) {
+        if (startDestination == Screen.Home && initialCategory != null && runCatching { Category.valueOf(initialCategory) }.isSuccess) {
+            navController.navigate("${Screen.RoutineDetail.substringBefore("{")}$initialCategory")
+        }
+    }
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -79,6 +94,38 @@ fun AppNavGraph(
                 viewModel = viewModel,
                 onBackToHome = {
                     navController.popBackStack()
+                },
+                onPlanTransfer = { navController.navigate(Screen.PlanTransfer) },
+                onAiPlan = { navController.navigate(Screen.AiPlan) }
+            )
+        }
+
+        composable(Screen.PlanTransfer) {
+            val viewModel: SettingsViewModel = hiltViewModel()
+            val context = LocalContext.current
+            PlanTransferScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() },
+                onShare = { json ->
+                    context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                        type = "application/json"
+                        putExtra(Intent.EXTRA_TEXT, json)
+                    }, "Share fitness plan"))
+                }
+            )
+        }
+
+        composable(Screen.AiPlan) {
+            val context = LocalContext.current
+            val clipboard = LocalClipboardManager.current
+            AiPlanScreen(
+                onBack = { navController.popBackStack() },
+                onCopy = { clipboard.setText(AnnotatedString(it)) },
+                onShare = { prompt ->
+                    context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, prompt)
+                    }, "Share AI prompt"))
                 }
             )
         }
