@@ -13,10 +13,10 @@ val AppShapes = Shapes(
 )
 
 object AppSpacing {
-    val marginPage = 32.dp
-    val stackGap = 24.dp
-    val cardPadding = 32.dp
-    val listItemHeight = 64.dp
+    val marginPage = 24.dp
+    val stackGap = 16.dp
+    val cardPadding = 24.dp
+    val listItemHeight = 48.dp
     val spaceSm = 8.dp
     val spaceMd = 16.dp
     val spaceLg = 24.dp

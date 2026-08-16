@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,7 +45,7 @@ fun HomeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = AppSpacing.spaceMd),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -53,7 +57,7 @@ fun HomeScreen(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)
                 ) {
                     if (uiState is HomeUiState.Content) {
                         val streak = (uiState as HomeUiState.Content).streakCount
@@ -73,9 +77,14 @@ fun HomeScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.spaceLg))
 
-            when (val state = uiState) {
+            AnimatedContent(
+                targetState = uiState,
+                transitionSpec = { fadeIn() togetherWith fadeOut() },
+                label = "home-content"
+            ) { state ->
+            when (state) {
                 is HomeUiState.Loading -> {
                     Box(
                         modifier = Modifier.fillMaxSize(),
@@ -108,12 +117,18 @@ fun HomeScreen(
                                 val next = state.nextUpcoming
                                 if (next != null) {
                                     val formatter = DateTimeFormatter.ofPattern("hh:mm a")
-                                    Text(
+                                Text(
+                                    text = "○",
+                                    style = MaterialTheme.typography.headlineMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(AppSpacing.spaceMd))
+                                Text(
                                         text = "Next up: ${next.category.displayName}",
                                         style = MaterialTheme.typography.headlineMedium,
                                         color = MaterialTheme.colorScheme.onBackground
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
                                     Text(
                                         text = "Scheduled for ${next.startTime.format(formatter)}",
                                         style = MaterialTheme.typography.bodyMedium,
@@ -125,7 +140,7 @@ fun HomeScreen(
                                         style = MaterialTheme.typography.headlineMedium,
                                         color = MaterialTheme.colorScheme.onBackground
                                     )
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
                                     Text(
                                         text = "Set up category windows in Settings.",
                                         style = MaterialTheme.typography.bodyMedium,
@@ -136,6 +151,7 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
             }
         }
     }
@@ -161,11 +177,22 @@ fun HomeCard(
             modifier = Modifier.padding(AppSpacing.cardPadding)
         ) {
             Text(
+                text = when (selection.category) {
+                    Category.MORNING -> "☼"
+                    Category.MEALS -> "◦"
+                    Category.WORKOUT -> "＋"
+                    Category.EVENING -> "☾"
+                },
+                color = accentColor,
+                style = MaterialTheme.typography.headlineMedium
+            )
+            Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
+            Text(
                 text = selection.category.displayName,
                 style = MaterialTheme.typography.headlineLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppSpacing.spaceSm))
             Text(
                 text = "Window: ${selection.startTime.format(formatter)} - ${selection.endTime.format(formatter)}",
                 style = MaterialTheme.typography.bodyMedium,

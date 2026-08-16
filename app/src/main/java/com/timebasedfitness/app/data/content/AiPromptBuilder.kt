@@ -17,6 +17,7 @@ object AiPromptBuilder {
         Ask any essential follow-up questions before generating the plan. Do not diagnose injuries or medical conditions. Recommend professional advice when the user's limitations require it.
 
         User details:
+        - Preferred AI provider: ${request.provider}
         - Goal: ${request.goal}
         - Experience: ${request.experience}
         - Equipment: ${request.equipment}

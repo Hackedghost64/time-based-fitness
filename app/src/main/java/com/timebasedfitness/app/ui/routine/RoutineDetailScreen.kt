@@ -52,7 +52,7 @@ fun RoutineDetailScreen(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppSpacing.spaceMd))
                     Text(
                         text = "Back",
                         style = MaterialTheme.typography.labelSmall,
@@ -60,7 +60,7 @@ fun RoutineDetailScreen(
                         modifier = Modifier.clickable { onBackToHome() }
                     )
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppSpacing.spaceMd))
 
                     if (uiState.isEditing) {
                         OutlinedTextField(
@@ -86,7 +86,7 @@ fun RoutineDetailScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(AppSpacing.spaceLg))
 
                     if (uiState.isEditing) {
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
@@ -113,11 +113,11 @@ fun RoutineDetailScreen(
                                 val isChecked = uiState.checkedSteps.contains(index)
 
                                 Row(
-                                    modifier = Modifier.fillMaxWidth().clickable { viewModel.toggleStep(index) }.padding(vertical = 8.dp),
+                                    modifier = Modifier.fillMaxWidth().clickable { viewModel.toggleStep(index) }.padding(vertical = AppSpacing.spaceSm),
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {
                                     Checkbox(checked = isChecked, onCheckedChange = { viewModel.toggleStep(index) }, colors = CheckboxDefaults.colors(checkedColor = accentColor, uncheckedColor = MaterialTheme.colorScheme.outline))
-                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Spacer(modifier = Modifier.width(AppSpacing.spaceSm))
                                     Text(text = step, style = MaterialTheme.typography.bodyLarge, color = if (isChecked) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onSurface)
                                 }
                             }
