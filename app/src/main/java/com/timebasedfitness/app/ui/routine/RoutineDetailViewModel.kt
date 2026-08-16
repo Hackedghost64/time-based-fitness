@@ -8,6 +8,7 @@ import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.model.RoutineStep
 import com.timebasedfitness.app.data.repository.CompletionRepository
 import com.timebasedfitness.app.data.repository.RoutineRepository
+import com.timebasedfitness.app.notifications.TimerNotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -22,7 +23,8 @@ data class ActiveTimer(
     val stepIndex: Int,
     val remainingSeconds: Int,
     val totalSeconds: Int,
-    val isRunning: Boolean
+    val isRunning: Boolean,
+    val targetEndMillis: Long = 0L
 )
 
 data class RoutineDetailUiState(
@@ -31,6 +33,7 @@ data class RoutineDetailUiState(
     val checkedSteps: Set<Int> = emptySet(),
     val activeTimer: ActiveTimer? = null,
     val completedTimerIndex: Int? = null,
+    val isAutoChainingEnabled: Boolean = false,
     val isCompleted: Boolean = false,
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
@@ -43,7 +46,8 @@ data class RoutineDetailUiState(
 class RoutineDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val routineRepository: RoutineRepository,
-    private val completionRepository: CompletionRepository
+    private val completionRepository: CompletionRepository,
+    private val timerNotificationHelper: TimerNotificationHelper
 ) : ViewModel() {
 
     private val categoryParam: String? = savedStateHandle["category"]
@@ -76,6 +80,10 @@ class RoutineDetailViewModel @Inject constructor(
         }
     }
 
+    fun toggleAutoChaining() {
+        _uiState.update { it.copy(isAutoChainingEnabled = !it.isAutoChainingEnabled) }
+    }
+
     fun toggleStep(index: Int) {
         _uiState.update { current ->
             val updated = if (current.checkedSteps.contains(index)) {
@@ -89,11 +97,13 @@ class RoutineDetailViewModel @Inject constructor(
 
     fun startTimer(stepIndex: Int, totalSeconds: Int) {
         val currentTimer = _uiState.value.activeTimer
-        val remaining = if (currentTimer != null && currentTimer.stepIndex == stepIndex) {
+        val remaining = if (currentTimer != null && currentTimer.stepIndex == stepIndex && currentTimer.remainingSeconds > 0) {
             currentTimer.remainingSeconds
         } else {
             totalSeconds
         }
+
+        val targetEnd = System.currentTimeMillis() + (remaining * 1000L)
 
         timerJob?.cancel()
         _uiState.update {
@@ -102,41 +112,66 @@ class RoutineDetailViewModel @Inject constructor(
                     stepIndex = stepIndex,
                     remainingSeconds = remaining,
                     totalSeconds = totalSeconds,
-                    isRunning = true
+                    isRunning = true,
+                    targetEndMillis = targetEnd
                 ),
                 completedTimerIndex = null
             )
         }
 
+        val stepName = _uiState.value.routineContent?.steps?.getOrNull(stepIndex)?.text ?: "Step ${stepIndex + 1}"
+        val categoryName = _uiState.value.category?.name.orEmpty()
+        timerNotificationHelper.showTimerNotification(stepName, remaining, categoryName)
+
         timerJob = viewModelScope.launch {
-            var currentRemaining = remaining
-            while (currentRemaining > 0) {
-                delay(1000L)
-                currentRemaining--
-                val finalRem = currentRemaining
+            while (true) {
+                delay(500L)
+                val now = System.currentTimeMillis()
+                val rem = kotlin.math.max(0, ((targetEnd - now + 999) / 1000).toInt())
+
                 _uiState.update { state ->
                     state.activeTimer?.let { timer ->
-                        if (timer.stepIndex == stepIndex) {
-                            state.copy(activeTimer = timer.copy(remainingSeconds = finalRem))
+                        if (timer.stepIndex == stepIndex && timer.isRunning) {
+                            state.copy(activeTimer = timer.copy(remainingSeconds = rem))
                         } else state
                     } ?: state
+                }
+
+                if (rem > 0) {
+                    timerNotificationHelper.showTimerNotification(stepName, rem, categoryName)
+                } else {
+                    break
                 }
             }
 
             // Auto-complete step when timer reaches zero!
+            timerNotificationHelper.dismiss()
+            val newChecked = _uiState.value.checkedSteps + stepIndex
             _uiState.update { state ->
-                val newChecked = state.checkedSteps + stepIndex
                 state.copy(
                     checkedSteps = newChecked,
                     activeTimer = null,
                     completedTimerIndex = stepIndex
                 )
             }
+
+            // Rest timer chaining: if enabled, auto-start next timed step!
+            if (_uiState.value.isAutoChainingEnabled) {
+                val steps = _uiState.value.routineContent?.steps.orEmpty()
+                val nextTimedIndex = (stepIndex + 1 until steps.size).firstOrNull { idx ->
+                    steps[idx].isTimer && !newChecked.contains(idx)
+                }
+                if (nextTimedIndex != null) {
+                    delay(1500L) // Brief transition pause
+                    startTimer(nextTimedIndex, steps[nextTimedIndex].durationSeconds)
+                }
+            }
         }
     }
 
     fun pauseTimer() {
         timerJob?.cancel()
+        timerNotificationHelper.dismiss()
         _uiState.update { state ->
             state.activeTimer?.let { timer ->
                 state.copy(activeTimer = timer.copy(isRunning = false))
@@ -146,6 +181,7 @@ class RoutineDetailViewModel @Inject constructor(
 
     fun resetTimer(stepIndex: Int, totalSeconds: Int) {
         timerJob?.cancel()
+        timerNotificationHelper.dismiss()
         _uiState.update { state ->
             state.copy(
                 activeTimer = ActiveTimer(
@@ -157,6 +193,12 @@ class RoutineDetailViewModel @Inject constructor(
                 completedTimerIndex = null
             )
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        timerJob?.cancel()
+        timerNotificationHelper.dismiss()
     }
 
     fun markDone(onDone: () -> Unit) {

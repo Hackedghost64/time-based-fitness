@@ -114,6 +114,29 @@ fun RoutineDetailScreen(
                             }
                             TextButton(onClick = viewModel::startEditing) { Text("Edit") }
                         }
+
+                        if (routine.steps.count { it.isTimer } >= 2) {
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Surface(
+                                    shape = RoundedCornerShape(16.dp),
+                                    color = if (uiState.isAutoChainingEnabled) accentColor.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                                    border = BorderStroke(1.dp, if (uiState.isAutoChainingEnabled) accentColor else MaterialTheme.colorScheme.outlineVariant),
+                                    modifier = Modifier.clickable { viewModel.toggleAutoChaining() }
+                                ) {
+                                    Text(
+                                        text = if (uiState.isAutoChainingEnabled) "⚡ Auto-chain timers: ON" else "⚡ Auto-chain timers: OFF",
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = if (uiState.isAutoChainingEnabled) accentColor else MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                }
+                            }
+                        }
                     }
 
                     Spacer(modifier = Modifier.height(AppSpacing.spaceLg))
