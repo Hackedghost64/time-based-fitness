@@ -11,7 +11,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.LocalTime
@@ -36,11 +35,12 @@ class SettingsViewModel @Inject constructor(
 
     private val _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
+    private var isLocallyModified = false
 
     init {
         viewModelScope.launch {
             categoryRepository.categorySelections.collect { list ->
-                if (_uiState.value.selections.isEmpty()) {
+                if (!isLocallyModified || _uiState.value.selections.isEmpty()) {
                     _uiState.update { it.copy(selections = list) }
                 }
             }
@@ -48,6 +48,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun toggleCategory(category: Category) {
+        isLocallyModified = true
         _uiState.update { current ->
             val updated = current.selections.map { sel ->
                 if (sel.category == category) sel.copy(isEnabled = !sel.isEnabled) else sel
@@ -57,6 +58,7 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateTimes(category: Category, startTime: LocalTime, endTime: LocalTime) {
+        isLocallyModified = true
         _uiState.update { current ->
             val updated = current.selections.map { sel ->
                 if (sel.category == category) sel.copy(startTime = startTime, endTime = endTime) else sel
@@ -68,9 +70,11 @@ class SettingsViewModel @Inject constructor(
     fun saveSettings(onSuccess: () -> Unit) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            categoryRepository.saveSelections(_uiState.value.selections)
-            notificationScheduler.reschedule(_uiState.value.selections)
-            WidgetSnapshot.update(context, _uiState.value.selections)
+            val currentSelections = _uiState.value.selections
+            categoryRepository.saveSelections(currentSelections)
+            notificationScheduler.reschedule(currentSelections)
+            WidgetSnapshot.update(context, currentSelections)
+            isLocallyModified = false
             _uiState.update { it.copy(isSaving = false) }
             onSuccess()
         }
@@ -81,18 +85,16 @@ class SettingsViewModel @Inject constructor(
         decoded.fold(
             onSuccess = { plan ->
                 viewModelScope.launch {
-                    routineRepository.importPlan(plan)
-                    categoryRepository.applyPlanSchedules(plan)
-                    notificationScheduler.reschedule(plan.categories.map { item ->
-                        com.timebasedfitness.app.data.model.CategorySelection(
-                            category = Category.valueOf(item.category),
-                            isEnabled = true,
-                            startTime = item.startTime?.let(LocalTime::parse) ?: LocalTime.of(9, 0),
-                            endTime = item.endTime?.let(LocalTime::parse) ?: LocalTime.of(17, 0)
-                        )
-                    })
-                    WidgetSnapshot.update(context, categoryRepository.categorySelections.first())
-                    onResult(null)
+                    try {
+                        val updatedSelections = routineRepository.importPlan(plan)
+                        notificationScheduler.reschedule(updatedSelections)
+                        WidgetSnapshot.update(context, updatedSelections)
+                        isLocallyModified = false
+                        _uiState.update { it.copy(selections = updatedSelections) }
+                        onResult(null)
+                    } catch (e: Exception) {
+                        onResult(e.message ?: "Failed to import plan")
+                    }
                 }
             },
             onFailure = { error -> onResult(error.message ?: "Invalid plan JSON") }

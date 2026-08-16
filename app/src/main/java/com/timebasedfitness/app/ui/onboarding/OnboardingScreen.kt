@@ -49,7 +49,7 @@ fun OnboardingScreen(
             Column {
                 Spacer(modifier = Modifier.height(24.dp))
                 Text(
-                    text = "Welcome to\nTime-Based Fitness",
+                    text = "Welcome to\nOnset",
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onBackground
                 )

@@ -21,7 +21,7 @@ import com.timebasedfitness.app.ui.theme.BackgroundWarm
 
 class NowRoutineWidget : GlanceAppWidget() {
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val snapshot = WidgetSnapshot.read(context)
+        val snapshot = WidgetSnapshot.compute(context)
         provideContent {
             Column(
                 modifier = GlanceModifier.fillMaxSize().background(BackgroundWarm).padding(16.dp).clickable(actionStartActivity(Intent(context, MainActivity::class.java))),

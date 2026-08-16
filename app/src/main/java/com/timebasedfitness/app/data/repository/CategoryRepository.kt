@@ -45,12 +45,14 @@ class CategoryRepository @Inject constructor(
         })
     }
 
-    private fun getDefaultSelections(): List<CategorySelection> {
-        return listOf(
-            CategorySelection(Category.MORNING, isEnabled = true, startTime = LocalTime.of(6, 0), endTime = LocalTime.of(9, 0)),
-            CategorySelection(Category.MEALS, isEnabled = true, startTime = LocalTime.of(12, 0), endTime = LocalTime.of(14, 0)),
-            CategorySelection(Category.WORKOUT, isEnabled = true, startTime = LocalTime.of(17, 0), endTime = LocalTime.of(19, 0)),
-            CategorySelection(Category.EVENING, isEnabled = true, startTime = LocalTime.of(21, 0), endTime = LocalTime.of(23, 0))
-        )
+    companion object {
+        fun getDefaultSelections(): List<CategorySelection> {
+            return listOf(
+                CategorySelection(Category.MORNING, isEnabled = true, startTime = LocalTime.of(6, 0), endTime = LocalTime.of(9, 0)),
+                CategorySelection(Category.MEALS, isEnabled = true, startTime = LocalTime.of(12, 0), endTime = LocalTime.of(14, 0)),
+                CategorySelection(Category.WORKOUT, isEnabled = true, startTime = LocalTime.of(17, 0), endTime = LocalTime.of(19, 0)),
+                CategorySelection(Category.EVENING, isEnabled = true, startTime = LocalTime.of(21, 0), endTime = LocalTime.of(23, 0))
+            )
+        }
     }
 }

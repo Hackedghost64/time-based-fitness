@@ -1,3 +1,14 @@
 <resources>
     <string name="app_name">Onset</string>
+    <string name="welcome">Welcome to Onset</string>
+    <string name="categories">Categories</string>
+    <string name="time_windows">Time Windows</string>
+    <string name="get_started">Get Started</string>
+    <string name="save_settings">Save Settings</string>
+    <string name="nothing_scheduled">Nothing scheduled right now.</string>
+    <string name="set_up_windows">Set up category windows</string>
+    <string name="next_up">Next up</string>
+    <string name="ready_for_routine">Ready for a routine?</string>
+    <string name="alert_ready">Is ready</string>
+    <string name="notification_description">Open your checklist</string>
 </resources>
