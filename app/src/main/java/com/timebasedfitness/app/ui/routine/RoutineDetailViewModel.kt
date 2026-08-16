@@ -113,9 +113,18 @@ class RoutineDetailViewModel @Inject constructor(
             .take(100)
             .map { it.take(500) }
         if (title.isEmpty() || steps.isEmpty()) return
+
+        val existingDays = _uiState.value.routineContent?.stepsByDay.orEmpty()
+        val todayKey = java.time.LocalDate.now().dayOfWeek.name
+        val updatedDays = if (existingDays.isNotEmpty()) {
+            existingDays.toMutableMap().apply { put(todayKey, steps) }
+        } else {
+            emptyMap()
+        }
+
         viewModelScope.launch {
             _uiState.update { it.copy(isSaving = true) }
-            routineRepository.save(category, RoutineContent(title, steps))
+            routineRepository.save(category, RoutineContent(title, steps, updatedDays))
             _uiState.update { it.copy(isEditing = false, isSaving = false) }
         }
     }

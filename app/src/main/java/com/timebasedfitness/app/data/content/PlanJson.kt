@@ -4,6 +4,8 @@ import com.timebasedfitness.app.data.model.Category
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Serializable
 data class FitnessPlanJson(
@@ -29,27 +31,120 @@ object PlanJsonCodec {
     fun encode(plan: FitnessPlanJson): String = json.encodeToString(plan)
 
     fun decode(raw: String): Result<FitnessPlanJson> = runCatching {
-        json.decodeFromString<FitnessPlanJson>(raw).also(::validate)
+        val decoded = json.decodeFromString<FitnessPlanJson>(raw)
+        normalizeAndValidate(decoded)
     }
 
-    private fun validate(plan: FitnessPlanJson) {
-        require(plan.schemaVersion == 1) { "Unsupported schema version: ${plan.schemaVersion}" }
+    private fun normalizeAndValidate(plan: FitnessPlanJson): FitnessPlanJson {
+        require(plan.schemaVersion >= 1) { "Unsupported schema version: ${plan.schemaVersion}" }
         require(plan.categories.isNotEmpty()) { "The plan must contain at least one category." }
-        require(plan.categories.size <= Category.entries.size) { "The plan contains too many categories." }
         require(plan.title.isNotBlank() && plan.title.length <= 120) { "The plan title is invalid." }
 
-        plan.categories.forEach { item ->
-            require(item.category in Category.entries.map { it.name }) { "Unknown category: ${item.category}" }
+        val normalizedCategories = mutableListOf<PlanCategoryJson>()
+        val seenCategories = mutableSetOf<String>()
+
+        for (item in plan.categories) {
+            val mappedCategory = mapCategory(item.category) ?: continue
+            if (seenCategories.contains(mappedCategory.name)) continue
+            seenCategories.add(mappedCategory.name)
+
             require(item.title.isNotBlank() && item.title.length <= 120) { "A routine title is invalid." }
             require(item.steps.isNotEmpty() || item.days.values.any { it.isNotEmpty() }) { "Each routine needs 1–100 steps." }
             require(item.steps.size <= 100 && item.steps.all { it.isNotBlank() && it.length <= 500 }) { "A routine step is invalid." }
-            require(item.days.keys.all { it in VALID_WEEKDAYS }) { "Invalid weekday in routine." }
-            require(item.days.values.all { it.isNotEmpty() && it.size <= 100 && it.all { step -> step.isNotBlank() && step.length <= 500 } }) { "A daily routine step is invalid." }
-            item.startTime?.let { require(it.matches(Regex("^([01]\\d|2[0-3]):[0-5]\\d$"))) { "Invalid start time: $it" } }
-            item.endTime?.let { require(it.matches(Regex("^([01]\\d|2[0-3]):[0-5]\\d$"))) { "Invalid end time: $it" } }
+
+            val normalizedDays = mutableMapOf<String, List<String>>()
+            for ((dayKey, daySteps) in item.days) {
+                val mappedDay = mapWeekday(dayKey) ?: continue
+                require(daySteps.isNotEmpty() && daySteps.size <= 100 && daySteps.all { step -> step.isNotBlank() && step.length <= 500 }) {
+                    "A daily routine step for $mappedDay is invalid."
+                }
+                normalizedDays[mappedDay] = daySteps
+            }
+
+            val normalizedStart = item.startTime?.let { raw ->
+                FlexibleTimeParser.parse(raw)?.format(DateTimeFormatter.ofPattern("HH:mm"))
+                    ?: error("Invalid start time format: $raw")
+            }
+            val normalizedEnd = item.endTime?.let { raw ->
+                FlexibleTimeParser.parse(raw)?.format(DateTimeFormatter.ofPattern("HH:mm"))
+                    ?: error("Invalid end time format: $raw")
+            }
+
+            normalizedCategories.add(
+                item.copy(
+                    category = mappedCategory.name,
+                    title = item.title.trim(),
+                    startTime = normalizedStart,
+                    endTime = normalizedEnd,
+                    steps = item.steps.map(String::trim).filter(String::isNotEmpty),
+                    days = normalizedDays
+                )
+            )
         }
-        require(plan.categories.map { it.category }.toSet().size == plan.categories.size) { "Categories must be unique." }
+
+        require(normalizedCategories.isNotEmpty()) {
+            "No recognized categories found in the plan (must match Morning, Meals, Workout, or Evening)."
+        }
+
+        return plan.copy(
+            title = plan.title.trim(),
+            categories = normalizedCategories
+        )
     }
 
-    private val VALID_WEEKDAYS = setOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
+    fun mapCategory(raw: String): Category? {
+        val clean = raw.trim().uppercase(Locale.US).replace(" ", "_").replace("-", "_")
+        return runCatching { Category.valueOf(clean) }.getOrNull() ?: when {
+            clean.contains("BREAKFAST") || clean.contains("MEAL") || clean.contains("LUNCH") || clean.contains("DINNER") || clean.contains("FOOD") || clean.contains("NUTRITION") || clean.contains("DIET") || clean.contains("SNACK") -> Category.MEALS
+            clean.contains("MORN") || clean.contains("WAKE") || clean.contains("SUNRISE") || clean.contains("DAWN") -> Category.MORNING
+            clean.contains("WORKOUT") || clean.contains("EXERCISE") || clean.contains("GYM") || clean.contains("FITNESS") || clean.contains("TRAIN") || clean.contains("CARDIO") || clean.contains("LIFT") || clean.contains("STRETCH") || clean.contains("RUN") -> Category.WORKOUT
+            clean.contains("EVEN") || clean.contains("NIGHT") || clean.contains("SLEEP") || clean.contains("BED") || clean.contains("WIND") || clean.contains("MEDITATION") -> Category.EVENING
+            else -> null
+        }
+    }
+
+    private fun mapWeekday(raw: String): String? {
+        val clean = raw.trim().uppercase(Locale.US)
+        return when {
+            clean.startsWith("MON") -> "MONDAY"
+            clean.startsWith("TUE") -> "TUESDAY"
+            clean.startsWith("WED") -> "WEDNESDAY"
+            clean.startsWith("THU") -> "THURSDAY"
+            clean.startsWith("FRI") -> "FRIDAY"
+            clean.startsWith("SAT") -> "SATURDAY"
+            clean.startsWith("SUN") -> "SUNDAY"
+            else -> null
+        }
+    }
+}
+
+object FlexibleTimeParser {
+    private val patterns = listOf(
+        DateTimeFormatter.ofPattern("H:mm"),
+        DateTimeFormatter.ofPattern("HH:mm"),
+        DateTimeFormatter.ofPattern("h:mm a", Locale.US),
+        DateTimeFormatter.ofPattern("hh:mm a", Locale.US),
+        DateTimeFormatter.ofPattern("h:mma", Locale.US),
+        DateTimeFormatter.ofPattern("hh:mma", Locale.US),
+        DateTimeFormatter.ofPattern("h a", Locale.US),
+        DateTimeFormatter.ofPattern("ha", Locale.US),
+        DateTimeFormatter.ofPattern("H", Locale.US),
+        DateTimeFormatter.ofPattern("HH", Locale.US)
+    )
+
+    fun parse(raw: String): java.time.LocalTime? {
+        val trimmed = raw.trim()
+        for (formatter in patterns) {
+            try {
+                return java.time.LocalTime.parse(trimmed, formatter)
+            } catch (_: Exception) {}
+        }
+        val upper = trimmed.uppercase(Locale.US)
+        for (formatter in patterns) {
+            try {
+                return java.time.LocalTime.parse(upper, formatter)
+            } catch (_: Exception) {}
+        }
+        return null
+    }
 }

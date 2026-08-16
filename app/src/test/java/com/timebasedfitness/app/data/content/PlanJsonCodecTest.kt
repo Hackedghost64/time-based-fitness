@@ -21,25 +21,47 @@ class PlanJsonCodecTest {
     }
 
     @Test
-    fun decode_rejectsUnknownCategory() {
-        val result = PlanJsonCodec.decode(
-            """{"schemaVersion":1,"title":"Bad","categories":[{"category":"UNKNOWN","title":"Routine","steps":["Step"]}]}"""
-        )
+    fun decode_acceptsFlexibleTimeFormats() {
+        val json = """{"schemaVersion":1,"title":"Flexible Times","categories":[{"category":"WORKOUT","title":"Gym","startTime":"6:00 AM","endTime":"7:30 pm","steps":["Lift"]}]}"""
+        val result = PlanJsonCodec.decode(json)
 
-        assertTrue(result.isFailure)
+        assertTrue(result.isSuccess)
+        val decoded = result.getOrThrow()
+        assertEquals("06:00", decoded.categories[0].startTime)
+        assertEquals("19:30", decoded.categories[0].endTime)
     }
 
     @Test
-    fun decode_rejectsInvalidTimeFormat() {
-        val badStart = PlanJsonCodec.decode(
-            """{"schemaVersion":1,"title":"Bad","categories":[{"category":"WORKOUT","title":"Routine","startTime":"25:00","endTime":"18:00","steps":["Step"]}]}"""
-        )
-        assertTrue(badStart.isFailure)
+    fun decode_mapsCategoryAliases() {
+        val json = """{"schemaVersion":1,"title":"AI Plan","categories":[{"category":"Breakfast Routine","title":"Healthy Meal","steps":["Oatmeal"]},{"category":"Gym Training","title":"Strength","steps":["Bench"]}]}"""
+        val result = PlanJsonCodec.decode(json)
 
-        val badEnd = PlanJsonCodec.decode(
-            """{"schemaVersion":1,"title":"Bad","categories":[{"category":"WORKOUT","title":"Routine","startTime":"07:00","endTime":"7:00","steps":["Step"]}]}"""
+        assertTrue(result.isSuccess)
+        val decoded = result.getOrThrow()
+        assertEquals("MEALS", decoded.categories[0].category)
+        assertEquals("WORKOUT", decoded.categories[1].category)
+    }
+
+    @Test
+    fun decode_normalizesWeekdayAbbreviations() {
+        val json = """{"schemaVersion":1,"title":"Split","categories":[{"category":"WORKOUT","title":"Gym","steps":["Default"],"days":{"Mon":["Chest"],"Wed":["Back"],"Fri":["Legs"]}}]}"""
+        val result = PlanJsonCodec.decode(json)
+
+        assertTrue(result.isSuccess)
+        val decoded = result.getOrThrow()
+        val days = decoded.categories[0].days
+        assertTrue(days.containsKey("MONDAY"))
+        assertTrue(days.containsKey("WEDNESDAY"))
+        assertTrue(days.containsKey("FRIDAY"))
+    }
+
+    @Test
+    fun decode_rejectsPlanWithNoValidCategories() {
+        val result = PlanJsonCodec.decode(
+            """{"schemaVersion":1,"title":"Bad","categories":[{"category":"XYZZY_RANDOM","title":"Routine","steps":["Step"]}]}"""
         )
-        assertTrue(badEnd.isFailure)
+
+        assertTrue(result.isFailure)
     }
 
     @Test
