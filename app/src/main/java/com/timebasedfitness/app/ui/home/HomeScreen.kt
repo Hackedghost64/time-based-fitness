@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.semantics
 import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.model.CategorySelection
 import com.timebasedfitness.app.ui.theme.*
@@ -67,7 +68,7 @@ fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onS
 @Composable
 private fun HomeCard(selection: CategorySelection, format: DateTimeFormatter, onClick: () -> Unit) {
     val accent = CategoryTheme.getAccentColor(selection.category)
-    Surface(modifier = Modifier.fillMaxWidth().shadow(2.dp, RoundedCornerShape(28.dp), ambientColor = accent.copy(alpha = .06f)).clickable(onClick = onClick), shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.surfaceContainerLowest, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
+    Surface(modifier = Modifier.fillMaxWidth().semantics(mergeDescendants = true) {}.shadow(2.dp, RoundedCornerShape(28.dp), ambientColor = accent.copy(alpha = .06f)).clickable(onClick = onClick), shape = RoundedCornerShape(28.dp), color = MaterialTheme.colorScheme.surfaceContainerLowest, border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)) {
         Column(Modifier.padding(28.dp)) {
             Surface(modifier = Modifier.size(56.dp), shape = RoundedCornerShape(16.dp), color = accent.copy(alpha = .1f), border = BorderStroke(1.dp, accent.copy(alpha = .25f))) { Box(contentAlignment = Alignment.Center) { Icon(rememberVectorPainter(CategoryIcons.forCategory(selection.category)), null, tint = accent, modifier = Modifier.size(28.dp)) } }
             Spacer(Modifier.height(20.dp))

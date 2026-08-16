@@ -19,12 +19,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.timebasedfitness.app.ui.theme.AppSpacing
 
+import android.widget.Toast
+import androidx.compose.ui.platform.LocalContext
+
 @Composable
 fun PlanTransferScreen(
     viewModel: SettingsViewModel,
     onBack: () -> Unit,
     onShare: (String) -> Unit
 ) {
+    val context = LocalContext.current
     var jsonText by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     Column(
@@ -57,7 +61,15 @@ fun PlanTransferScreen(
                 if (jsonText.length > MAX_PASTED_JSON_CHARS) {
                     error = "Plan is too large (max $MAX_PASTED_JSON_CHARS characters)."
                 } else {
-                    viewModel.importPlan(jsonText) { error = it ?: run { jsonText = ""; onBack(); null } }
+                    viewModel.importPlan(jsonText) { err ->
+                        if (err != null) {
+                            error = err
+                        } else {
+                            Toast.makeText(context, "Plan imported successfully", Toast.LENGTH_SHORT).show()
+                            jsonText = ""
+                            onBack()
+                        }
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

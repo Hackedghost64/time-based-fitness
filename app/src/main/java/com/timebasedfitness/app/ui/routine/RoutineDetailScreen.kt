@@ -90,6 +90,16 @@ fun RoutineDetailScreen(
 
                     if (uiState.isEditing) {
                         LazyColumn(verticalArrangement = Arrangement.spacedBy(AppSpacing.spaceMd)) {
+                            if (uiState.editSteps.isEmpty()) {
+                                item {
+                                    Text(
+                                        text = "No steps added yet. Tap \"Add step\" below to create your routine.",
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.padding(vertical = AppSpacing.spaceMd)
+                                    )
+                                }
+                            }
                             itemsIndexed(uiState.editSteps) { index, step ->
                                 Row(verticalAlignment = Alignment.CenterVertically) {
                                     OutlinedTextField(

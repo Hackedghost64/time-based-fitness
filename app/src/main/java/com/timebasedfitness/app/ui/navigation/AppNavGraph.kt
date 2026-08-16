@@ -109,6 +109,7 @@ fun AppNavGraph(
                 onShare = { json ->
                     context.startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).apply {
                         type = "application/json"
+                        putExtra(Intent.EXTRA_SUBJECT, "Onset Fitness Plan (JSON)")
                         putExtra(Intent.EXTRA_TEXT, json)
                     }, "Share fitness plan"))
                 }
