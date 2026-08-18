@@ -33,7 +33,8 @@ fun SettingsScreen(
     viewModel: SettingsViewModel,
     onBackToHome: () -> Unit,
     onPlanTransfer: () -> Unit,
-    onAiPlan: () -> Unit
+    onAiPlan: () -> Unit,
+    onGuide: () -> Unit = {}
 ) {
     val state by viewModel.uiState.collectAsState()
     var activePicker by remember { mutableStateOf<PickerTarget?>(null) }
@@ -76,6 +77,9 @@ fun SettingsScreen(
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
+                OutlinedButton(onClick = onGuide, modifier = Modifier.fillMaxWidth()) {
+                    Text("How Onset works  ·  App Guide")
+                }
                 OutlinedButton(onClick = onPlanTransfer, modifier = Modifier.fillMaxWidth()) {
                     Text("Import or share JSON plan")
                 }

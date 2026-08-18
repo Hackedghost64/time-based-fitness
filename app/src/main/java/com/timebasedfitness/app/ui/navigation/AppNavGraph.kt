@@ -18,6 +18,7 @@ import com.timebasedfitness.app.ui.settings.SettingsScreen
 import com.timebasedfitness.app.ui.settings.SettingsViewModel
 import com.timebasedfitness.app.ui.settings.PlanTransferScreen
 import com.timebasedfitness.app.ui.settings.AiPlanScreen
+import com.timebasedfitness.app.ui.settings.GuideScreen
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.text.AnnotatedString
 import android.content.Intent
@@ -32,6 +33,7 @@ object Screen {
     const val Progress = "progress"
     const val PlanTransfer = "plan-transfer"
     const val AiPlan = "ai-plan"
+    const val Guide = "guide"
 
     fun routineDetail(category: Category) = "routine/${category.name}"
 }
@@ -108,7 +110,8 @@ fun AppNavGraph(
                     navController.popBackStack()
                 },
                 onPlanTransfer = { navController.navigate(Screen.PlanTransfer) },
-                onAiPlan = { navController.navigate(Screen.AiPlan) }
+                onAiPlan = { navController.navigate(Screen.AiPlan) },
+                onGuide = { navController.navigate(Screen.Guide) }
             )
         }
 
@@ -141,6 +144,10 @@ fun AppNavGraph(
                     }, "Share AI prompt"))
                 }
             )
+        }
+
+        composable(Screen.Guide) {
+            GuideScreen(onBack = { navController.popBackStack() })
         }
     }
 }
