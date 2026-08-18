@@ -47,12 +47,12 @@ data class TimeWindow(
         val startToday = today.atTime(startTime)
 
         return if (isOvernight) {
-            if (now.toLocalTime().isAfter(endTime)) {
-                // We're in the window, it started today
-                startToday
-            } else {
-                // Window hasn't started yet today, it started yesterday
+            if (now.toLocalTime().isBefore(startTime)) {
+                // If before start time, the most recent window started yesterday
                 startToday.minusDays(1)
+            } else {
+                // Otherwise it started today
+                startToday
             }
         } else {
             startToday
@@ -61,20 +61,20 @@ data class TimeWindow(
 
     /**
      * Resolves the actual end [LocalDateTime] for a given [now].
-     * For overnight windows, if [now] is before the start time, the end is tomorrow.
-     * Otherwise, the end is today.
+     * For overnight windows, if [now] is before the start time, the end is today.
+     * Otherwise, the end is tomorrow.
      */
     fun endDateTime(now: LocalDateTime, zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
         val today = now.toLocalDate()
         val endToday = today.atTime(endTime)
 
         return if (isOvernight) {
-            if (now.toLocalTime().isBefore(startTime)) {
-                // Window hasn't started yet, ends tomorrow
-                endToday.plusDays(1)
-            } else {
-                // Window is active or ended, ends today
+            if (now.toLocalTime().isBefore(endTime)) {
+                // If in the morning part of overnight window, ends today
                 endToday
+            } else {
+                // Otherwise ends tomorrow
+                endToday.plusDays(1)
             }
         } else {
             endToday

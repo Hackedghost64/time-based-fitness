@@ -33,7 +33,7 @@ object HapticPatterns {
     /** Gentle double-pulse for timer completion */
     fun timerCompletePattern(): VibrationEffect {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            VibrationEffect.createPrecomposed(VibrationEffect.EFFECT_DOUBLE_CLICK)
+            VibrationEffect.createPredefined(VibrationEffect.EFFECT_DOUBLE_CLICK)
         } else {
             VibrationEffect.createWaveform(longArrayOf(0, 100, 50, 100), -1)
         }
@@ -42,7 +42,7 @@ object HapticPatterns {
     /** Stronger celebration pattern for streak milestones */
     fun milestoneCelebrationPattern(): VibrationEffect {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            VibrationEffect.createPrecomposed(VibrationEffect.EFFECT_HEAVY_CLICK)
+            VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK)
         } else {
             VibrationEffect.createWaveform(longArrayOf(0, 150, 50, 150, 50, 150), -1)
         }
