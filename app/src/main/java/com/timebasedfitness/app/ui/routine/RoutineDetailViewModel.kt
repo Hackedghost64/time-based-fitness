@@ -35,6 +35,8 @@ data class RoutineDetailUiState(
     val routineContent: RoutineContent? = null,
     val checkedSteps: Set<Int> = emptySet(),
     val activeTimer: ActiveTimer? = null,
+    val pendingTimerStepIndex: Int? = null,
+    val pendingTimerRemainingSeconds: Int = 0,
     val completedTimerIndex: Int? = null,
     val isAutoChainingEnabled: Boolean = false,
     val isCompleted: Boolean = false,
@@ -46,6 +48,41 @@ data class RoutineDetailUiState(
     val editGoal: String = "",
     val editSteps: List<RoutineStep> = emptyList()
 )
+
+internal fun RoutineDetailUiState.requestTimerStepToggle(index: Int): RoutineDetailUiState {
+    val step = routineContent?.steps?.getOrNull(index) ?: return this
+    val toggled = copy(
+        checkedSteps = if (checkedSteps.contains(index)) checkedSteps - index else checkedSteps + index,
+        pendingTimerStepIndex = null,
+        pendingTimerRemainingSeconds = 0
+    )
+    if (checkedSteps.contains(index) || !step.isTimer) return toggled
+
+    val timerFinished = activeTimer?.stepIndex == index && activeTimer.remainingSeconds == 0
+    return if (timerFinished) {
+        toggled
+    } else {
+        copy(
+            pendingTimerStepIndex = index,
+            pendingTimerRemainingSeconds = activeTimer
+                ?.takeIf { it.stepIndex == index }
+                ?.remainingSeconds
+                ?: step.durationSeconds
+        )
+    }
+}
+
+internal fun RoutineDetailUiState.confirmTimerStepOverride(): RoutineDetailUiState {
+    val index = pendingTimerStepIndex ?: return this
+    return copy(
+        checkedSteps = if (checkedSteps.contains(index)) checkedSteps - index else checkedSteps + index,
+        pendingTimerStepIndex = null,
+        pendingTimerRemainingSeconds = 0
+    )
+}
+
+internal fun RoutineDetailUiState.cancelTimerStepOverride(): RoutineDetailUiState =
+    copy(pendingTimerStepIndex = null, pendingTimerRemainingSeconds = 0)
 
 @HiltViewModel
 class RoutineDetailViewModel @Inject constructor(
@@ -130,6 +167,18 @@ class RoutineDetailViewModel @Inject constructor(
             }
             current.copy(checkedSteps = updated)
         }
+    }
+
+    fun requestToggleStep(index: Int) {
+        _uiState.update { it.requestTimerStepToggle(index) }
+    }
+
+    fun confirmTimerOverride() {
+        _uiState.update { it.confirmTimerStepOverride() }
+    }
+
+    fun cancelTimerOverride() {
+        _uiState.update { it.cancelTimerStepOverride() }
     }
 
     fun startTimer(stepIndex: Int, totalSeconds: Int) {

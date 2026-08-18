@@ -283,12 +283,12 @@ fun RoutineDetailScreen(
                                 ) {
                                     Column(modifier = Modifier.padding(14.dp)) {
                                         Row(
-                                            modifier = Modifier.fillMaxWidth().clickable { viewModel.toggleStep(index) },
+                                            modifier = Modifier.fillMaxWidth().clickable { viewModel.requestToggleStep(index) },
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Checkbox(
                                                 checked = isChecked,
-                                                onCheckedChange = { viewModel.toggleStep(index) },
+                                                onCheckedChange = { viewModel.requestToggleStep(index) },
                                                 colors = CheckboxDefaults.colors(
                                                     checkedColor = accentColor,
                                                     uncheckedColor = MaterialTheme.colorScheme.outline
@@ -391,6 +391,30 @@ fun RoutineDetailScreen(
                                 }
                             }
                         }
+                    }
+                }
+
+                uiState.pendingTimerStepIndex?.let { index ->
+                    val step = routine.steps.getOrNull(index)
+                    if (step != null) {
+                        val minutes = uiState.pendingTimerRemainingSeconds / 60
+                        val seconds = uiState.pendingTimerRemainingSeconds % 60
+                        AlertDialog(
+                            onDismissRequest = viewModel::cancelTimerOverride,
+                            title = { Text("Timer not finished") },
+                            text = {
+                                Text("You started a %02d:%02d timer for \"${step.text}\". Mark it complete anyway?".format(minutes, seconds))
+                            },
+                            confirmButton = {
+                                Button(
+                                    onClick = viewModel::confirmTimerOverride,
+                                    colors = ButtonDefaults.buttonColors(containerColor = accentColor)
+                                ) { Text("Complete anyway") }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = viewModel::cancelTimerOverride) { Text("Keep Going") }
+                            }
+                        )
                     }
                 }
 

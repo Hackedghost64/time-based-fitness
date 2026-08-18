@@ -15,17 +15,20 @@ import com.timebasedfitness.app.R
 import com.timebasedfitness.app.data.local.CategorySelectionDao
 import com.timebasedfitness.app.data.local.CompletionLogDao
 import com.timebasedfitness.app.data.model.Category
+import com.timebasedfitness.app.data.repository.CompletionRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.LocalTime
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class RoutineReminderReceiver : BroadcastReceiver() {
     @Inject lateinit var completionLogDao: CompletionLogDao
     @Inject lateinit var categorySelectionDao: CategorySelectionDao
+    @Inject lateinit var completionRepository: CompletionRepository
     @Inject lateinit var scheduler: NotificationScheduler
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -35,6 +38,9 @@ class RoutineReminderReceiver : BroadcastReceiver() {
         val pending = goAsync()
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                val today = LocalDate.now()
+                val nowTime = LocalTime.now()
+
                 // 1. Reschedule next occurrence so alarms do not drift with DST
                 val selections = categorySelectionDao.getAllCategorySelectionsSync()
                 val currentSel = selections.find { it.category == category }
@@ -42,9 +48,12 @@ class RoutineReminderReceiver : BroadcastReceiver() {
                     scheduler.scheduleNextReminder(currentSel)
                 }
 
-                // 2. Check if already completed today - if so, suppress reminder notification
-                val isCompletedToday = completionLogDao.getCountForDate(category, LocalDate.now()) > 0
-                if (isCompletedToday) {
+                // 2. Suppress when the routine is already done for this window
+                //    (either we have a count today, or the window has ended and
+                //    the user finished earlier — keeps "done" sticky until reset).
+                val selEnd = currentSel?.endTime
+                if (completionRepository.isCompletedInCurrentWindow(category, selEnd, today, nowTime)) {
+                    completionRepository.clearNudgeCounterForToday(category, today)
                     return@launch
                 }
 
@@ -64,6 +73,9 @@ class RoutineReminderReceiver : BroadcastReceiver() {
                     .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                     .build()
                 NotificationManagerCompat.from(context).notify(category.ordinal + 100, notification)
+                // Nudge cadence: bump the per-day counter so the next wake-up
+                // reschedules a fresh interval unless we've hit `maxPerWindow`.
+                scheduler.recordNudgeFire(category, today)
             } finally {
                 pending.finish()
             }

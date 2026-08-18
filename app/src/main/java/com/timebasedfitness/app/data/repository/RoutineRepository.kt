@@ -19,6 +19,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import java.time.LocalTime
 import java.time.DayOfWeek
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,7 +34,7 @@ class RoutineRepository @Inject constructor(
     private val contentRepository: ContentRepository
 ) {
     fun observe(category: Category): Flow<RoutineContent?> = dao.observe(category).map { entity ->
-        entity?.let { contentForToday(it) }
+        entity?.let { contentForToday(it, ZoneId.systemDefault()) }
             ?: contentRepository.getRoutine(category)
     }
 
@@ -134,10 +135,15 @@ class RoutineRepository @Inject constructor(
         return PlanJsonCodec.encode(FitnessPlanJson(categories = categories))
     }
 
-    private fun contentForToday(entity: RoutineEntity): RoutineContent {
+    internal fun contentForToday(entity: RoutineEntity, zone: ZoneId = ZoneId.systemDefault()): RoutineContent {
         val envelope = decodeEnvelope(entity.stepsJson)
-        val today = envelope.days[java.time.LocalDate.now().dayOfWeek.name]
-        return RoutineContent(entity.title, today ?: envelope.steps, envelope.days, envelope.goal)
+        val todayKey = java.time.LocalDate.now(zone).dayOfWeek.name
+        // Case-insensitive match guards against user-editable weekday labels
+        // (e.g. "Monday" vs "MONDAY") that came from older import formats.
+        val steps = envelope.days[todayKey]
+            ?: envelope.days.entries.firstOrNull { it.key.equals(todayKey, ignoreCase = true) }?.value
+            ?: envelope.steps
+        return RoutineContent(entity.title, steps, envelope.days, envelope.goal)
     }
 
     private fun encodeSteps(content: RoutineContent): String {

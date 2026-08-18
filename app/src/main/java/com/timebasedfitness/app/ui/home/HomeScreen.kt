@@ -22,8 +22,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.graphics.vector.path
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -58,6 +62,7 @@ fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onS
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             HomeCard(selection, routine, timeFormat) { onRoutineClick(selection.category) }
                             if (current.activeCategories.size > 1) Text("+${current.activeCategories.size - 1} more ready when you are", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                            StreakTile(current.streakCount, bestStreak(current.completedDates), current.completedDates)
                             QuietWeeklyHistoryRow(current.completedDates)
                         }
                     } else EmptyState(current, timeFormat)
@@ -176,8 +181,51 @@ private fun HomeCard(
 }
 
 @Composable
+private fun StreakTile(streak: Int, bestStreak: Int, completedDates: Set<LocalDate>) {
+    if (streak == 0) return
+
+    val accentColor = CategoryTheme.getAccentColor(Category.WORKOUT)
+    val isTodayCompleted = completedDates.contains(LocalDate.now())
+    val shape = RoundedCornerShape(if (streak >= 7) 20.dp else 16.dp)
+    val modifier = if (streak >= 7) {
+        Modifier
+            .fillMaxWidth()
+            .clip(shape)
+            .background(Brush.horizontalGradient(listOf(accentColor, accentColor.copy(alpha = 0.6f))))
+    } else {
+        Modifier.fillMaxWidth()
+    }
+    val contentColor = if (streak >= 7) MaterialTheme.colorScheme.onPrimary else accentColor
+
+    Surface(
+        modifier = modifier,
+        shape = shape,
+        color = if (streak >= 7) MaterialTheme.colorScheme.surface.copy(alpha = 0f) else accentColor.copy(alpha = 0.12f),
+        border = if (streak >= 7) null else BorderStroke(1.dp, accentColor.copy(alpha = 0.28f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 20.dp, vertical = if (streak >= 7) 16.dp else 12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(StreakFlame, contentDescription = null, tint = contentColor, modifier = Modifier.size(if (streak >= 7) 30.dp else 22.dp))
+            if (streak >= 7) {
+                Column {
+                    Text("$streak", style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.Bold, color = contentColor)
+                    Text("Best: $bestStreak${if (isTodayCompleted) " · Today ✓" else ""}", style = MaterialTheme.typography.labelSmall, color = contentColor)
+                }
+            } else {
+                Text("$streak", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold, color = contentColor)
+                Text("day streak", style = MaterialTheme.typography.labelSmall, color = contentColor)
+            }
+        }
+    }
+}
+
+@Composable
 private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
     val today = LocalDate.now()
+    val accentColor = CategoryTheme.getAccentColor(Category.WORKOUT)
     val daysOfWeek = (6 downTo 0).map { offset -> today.minusDays(offset.toLong()) }
 
     Surface(
@@ -208,10 +256,11 @@ private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
                     )
                     Box(
                         modifier = Modifier
-                            .size(10.dp)
-                            .clip(CircleShape)
+                            .size(18.dp)
+                            .clip(RoundedCornerShape(4.dp))
                             .background(
-                                if (isCompleted) MaterialTheme.colorScheme.primary
+                                if (isCompleted && isToday) accentColor
+                                else if (isCompleted) MaterialTheme.colorScheme.primary
                                 else if (isToday) MaterialTheme.colorScheme.outline
                                 else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                             )
@@ -222,15 +271,47 @@ private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
     }
 }
 
-@Composable private fun StreakRow(streak: Int) { if (streak > 0) Row(verticalAlignment = Alignment.CenterVertically) { Box(Modifier.size(6.dp).clip(CircleShape).background(MaterialTheme.colorScheme.outlineVariant)); Spacer(Modifier.width(8.dp)); Text("$streak day streak", style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant) } }
-
 @Composable private fun EmptyState(content: HomeUiState.Content, format: DateTimeFormatter) {
     Box(Modifier.fillMaxSize(), Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(56.dp).clip(CircleShape).border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape), Alignment.Center) { Box(Modifier.size(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.outlineVariant)) }
         Spacer(Modifier.height(24.dp)); Text("Nothing right now", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp)); Text(content.nextUpcoming?.let { "Next: ${it.category.displayName} at ${it.startTime.format(format).lowercase()}" } ?: "Set up category windows in Settings", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(24.dp))
+        StreakTile(content.streakCount, bestStreak(content.completedDates), content.completedDates)
+        if (content.streakCount > 0) Spacer(Modifier.height(8.dp))
         QuietWeeklyHistoryRow(content.completedDates)
     } }
 }
 
+private fun bestStreak(completedDates: Set<LocalDate>): Int {
+    val dates = completedDates.sorted()
+    if (dates.isEmpty()) return 0
+    var best = 1
+    var current = 1
+    dates.zipWithNext().forEach { (previous, next) ->
+        if (next == previous.plusDays(1)) current++ else current = 1
+        best = maxOf(best, current)
+    }
+    return best
+}
+
+private val StreakFlame: ImageVector = ImageVector.Builder(
+    name = "streak_flame",
+    defaultWidth = 24.dp,
+    defaultHeight = 24.dp,
+    viewportWidth = 24f,
+    viewportHeight = 24f
+).apply {
+    path(fill = SolidColor(Color.Black)) {
+        moveTo(13f, 2f)
+        curveTo(13f, 6f, 8f, 7f, 8f, 13f)
+        curveTo(8f, 17f, 10f, 20f, 12f, 22f)
+        curveTo(7f, 20f, 4f, 17f, 4f, 12f)
+        curveTo(4f, 7f, 8f, 4f, 11f, 2f)
+        curveTo(10f, 6f, 14f, 7f, 14f, 11f)
+        curveTo(14f, 13f, 13f, 15f, 12f, 16f)
+        curveTo(16f, 14f, 18f, 11f, 16f, 7f)
+        curveTo(20f, 10f, 20f, 14f, 18f, 18f)
+        curveTo(16f, 21f, 14f, 22f, 12f, 22f)
+    }
+}.build()
