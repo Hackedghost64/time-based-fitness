@@ -19,6 +19,9 @@ interface CompletionLogDao {
     @Query("SELECT COUNT(*) FROM completion_logs WHERE category = :category AND date = :date")
     suspend fun getCountForDate(category: com.timebasedfitness.app.data.model.Category, date: java.time.LocalDate): Int
 
+    @Query("SELECT * FROM completion_logs WHERE category = :category ORDER BY date DESC LIMIT 1")
+    suspend fun getMostRecentForCategory(category: com.timebasedfitness.app.data.model.Category): CompletionLog?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertLog(log: CompletionLog)
 }
