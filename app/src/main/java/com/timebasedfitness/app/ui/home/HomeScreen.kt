@@ -1,12 +1,16 @@
 package com.timebasedfitness.app.ui.home
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -196,9 +200,21 @@ private fun StreakTile(streak: Int, bestStreak: Int, completedDates: Set<LocalDa
         Modifier.fillMaxWidth()
     }
     val contentColor = if (streak >= 7) MaterialTheme.colorScheme.onPrimary else accentColor
+    
+    // Milestone detection for animation trigger
+    val isMilestone = streak in listOf(7, 30, 60, 90, 100, 365)
+    val scale = remember { Animatable(1f) }
+    
+    LaunchedEffect(streak) {
+        if (isMilestone) {
+            // Subtle pop animation on milestone
+            scale.animateTo(1.15f, tween(150))
+            scale.animateTo(1f, tween(150))
+        }
+    }
 
     Surface(
-        modifier = modifier,
+        modifier = modifier.then(Modifier.scale(scale.value).animateContentSize()),
         shape = shape,
         color = if (streak >= 7) MaterialTheme.colorScheme.surface.copy(alpha = 0f) else accentColor.copy(alpha = 0.12f),
         border = if (streak >= 7) null else BorderStroke(1.dp, accentColor.copy(alpha = 0.28f))
