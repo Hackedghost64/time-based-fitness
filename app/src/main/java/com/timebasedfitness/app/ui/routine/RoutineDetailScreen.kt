@@ -71,13 +71,27 @@ fun RoutineDetailScreen(
                 Column(
                     modifier = Modifier.weight(1f)
                 ) {
-                    Spacer(modifier = Modifier.height(AppSpacing.spaceMd))
-                    Text(
-                        text = "← Back",
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.clickable { onBackToHome() }
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "← Back",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.clickable { onBackToHome() }
+                        )
+                        IconButton(
+                            onClick = viewModel::toggleSoundEnabled,
+                            modifier = Modifier.size(36.dp)
+                        ) {
+                            Text(
+                                text = if (uiState.isSoundEnabled) "🔊" else "🔇",
+                                fontSize = 16.sp
+                            )
+                        }
+                    }
 
                     Spacer(modifier = Modifier.height(AppSpacing.spaceMd))
 
@@ -122,13 +136,41 @@ fun RoutineDetailScreen(
                             TextButton(onClick = viewModel::startEditing) { Text("Edit") }
                         }
 
-                        if (routine.steps.count { it.isTimer } >= 2) {
-                            Spacer(modifier = Modifier.height(8.dp))
+                        // Rest Timer & Auto-chain bar
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
                             Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.End,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Text(
+                                    text = "Rest:",
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                listOf(30, 60, 90).forEach { sec ->
+                                    Surface(
+                                        shape = RoundedCornerShape(12.dp),
+                                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+                                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
+                                        modifier = Modifier.clickable { viewModel.startRestTimer(sec) }
+                                    ) {
+                                        Text(
+                                            text = "${sec}s",
+                                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                            style = MaterialTheme.typography.labelSmall,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                }
+                            }
+
+                            if (routine.steps.count { it.isTimer } >= 2) {
                                 Surface(
                                     shape = RoundedCornerShape(16.dp),
                                     color = if (uiState.isAutoChainingEnabled) accentColor.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -136,11 +178,75 @@ fun RoutineDetailScreen(
                                     modifier = Modifier.clickable { viewModel.toggleAutoChaining() }
                                 ) {
                                     Text(
-                                        text = if (uiState.isAutoChainingEnabled) "⚡ Auto-chain timers: ON" else "⚡ Auto-chain timers: OFF",
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                                        text = if (uiState.isAutoChainingEnabled) "⚡ Auto: ON" else "⚡ Auto: OFF",
+                                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = if (uiState.isAutoChainingEnabled) accentColor else MaterialTheme.colorScheme.onSurfaceVariant
                                     )
+                                }
+                            }
+                        }
+
+                        // Active Rest Timer Banner
+                        uiState.restTimer?.let { restTimer ->
+                            Spacer(modifier = Modifier.height(10.dp))
+                            Surface(
+                                shape = RoundedCornerShape(16.dp),
+                                color = accentColor.copy(alpha = 0.15f),
+                                border = BorderStroke(1.dp, accentColor),
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 14.dp, vertical = 10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = "⏱ Rest",
+                                            style = MaterialTheme.typography.titleMedium,
+                                            fontWeight = FontWeight.Bold,
+                                            color = accentColor
+                                        )
+                                        val m = restTimer.remainingSeconds / 60
+                                        val s = restTimer.remainingSeconds % 60
+                                        Text(
+                                            text = "%02d:%02d".format(m, s),
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            fontWeight = FontWeight.Bold,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+
+                                    Row(
+                                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Surface(
+                                            shape = CircleShape,
+                                            color = accentColor.copy(alpha = 0.2f),
+                                            modifier = Modifier.clickable { viewModel.addRestSeconds(15) }
+                                        ) {
+                                            Text(
+                                                text = "+15s",
+                                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                                style = MaterialTheme.typography.labelSmall,
+                                                fontWeight = FontWeight.Bold,
+                                                color = accentColor
+                                            )
+                                        }
+                                        TextButton(
+                                            onClick = viewModel::cancelRestTimer,
+                                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp)
+                                        ) {
+                                            Text("Skip", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                        }
+                                    }
                                 }
                             }
                         }

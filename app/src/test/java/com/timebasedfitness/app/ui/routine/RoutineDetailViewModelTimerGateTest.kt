@@ -70,4 +70,18 @@ class RoutineDetailViewModelTimerGateTest {
         assertNull(result.pendingTimerStepIndex)
         assertEquals(0, result.pendingTimerRemainingSeconds)
     }
+
+    @Test
+    fun restTimer_initializesCorrectlyInUiState() {
+        val rest = RestTimer(remainingSeconds = 60, totalSeconds = 60, isRunning = true)
+        val state = RoutineDetailUiState(
+            routineContent = timerRoutine,
+            restTimer = rest,
+            isSoundEnabled = true
+        )
+
+        assertEquals(60, state.restTimer?.remainingSeconds)
+        assertTrue(state.restTimer?.isRunning == true)
+        assertTrue(state.isSoundEnabled)
+    }
 }

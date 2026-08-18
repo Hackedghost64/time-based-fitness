@@ -60,7 +60,7 @@ class NotificationScheduler @Inject constructor(
         if (!selection.isEnabled) return
         val today = now.toLocalDate()
         val completed = isCompletedInWindow
-            ?: kotlinx.coroutines.runBlocking {
+            ?: kotlinx.coroutines.runBlocking(kotlinx.coroutines.Dispatchers.IO) {
                 completionRepository.isCompletedInCurrentWindow(
                     category = selection.category,
                     selectionEnd = selection.endTime,
@@ -151,7 +151,6 @@ class NotificationScheduler @Inject constructor(
             isCompletedInWindow: Boolean
         ): Long {
             val window = TimeWindow(selection.startTime, selection.endTime)
-            val nowTime = now.toLocalTime()
 
             // Check if we're before the window starts
             if (window.hasNotStarted(now)) {

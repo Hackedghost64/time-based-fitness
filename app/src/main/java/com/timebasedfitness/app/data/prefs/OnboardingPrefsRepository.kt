@@ -20,9 +20,15 @@ class OnboardingPrefsRepository @Inject constructor(
     private val KEY_HAS_ONBOARDED = booleanPreferencesKey("has_onboarded")
     private val KEY_NUDGE_INTERVAL_MIN = intPreferencesKey("nudge_interval_min")
     private val KEY_NUDGE_MAX_PER_WINDOW = intPreferencesKey("nudge_max_per_window")
+    private val KEY_TIMER_SOUND_ENABLED = booleanPreferencesKey("timer_sound_enabled")
 
     val hasOnboarded: Flow<Boolean> = context.dataStore.data.map { preferences ->
         preferences[KEY_HAS_ONBOARDED] ?: false
+    }
+
+    /** Whether countdown audio beeps and completion chimes are enabled. Default true. */
+    val timerSoundEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
+        preferences[KEY_TIMER_SOUND_ENABLED] ?: true
     }
 
     /** Minutes between in-window reminders. Default 10. Allowed in {5, 10, 15, 30}. */
@@ -52,6 +58,12 @@ class OnboardingPrefsRepository @Inject constructor(
         val sanitized = max.coerceIn(0, 48)
         context.dataStore.edit { preferences ->
             preferences[KEY_NUDGE_MAX_PER_WINDOW] = sanitized
+        }
+    }
+
+    suspend fun setTimerSoundEnabled(enabled: Boolean) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_TIMER_SOUND_ENABLED] = enabled
         }
     }
 

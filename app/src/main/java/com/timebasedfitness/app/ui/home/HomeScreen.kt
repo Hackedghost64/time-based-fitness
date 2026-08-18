@@ -45,7 +45,12 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onSettingsClick: () -> Unit) {
+fun HomeScreen(
+    viewModel: HomeViewModel,
+    onRoutineClick: (Category) -> Unit,
+    onSettingsClick: () -> Unit,
+    onProgressClick: () -> Unit
+) {
     val state by viewModel.uiState.collectAsState()
     val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
     Surface(Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
@@ -55,7 +60,14 @@ fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onS
                     Text("Today", style = MaterialTheme.typography.headlineLarge)
                     Text(LocalDate.now().format(DateTimeFormatter.ofPattern("EEEE, MMMM d")), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
-                IconButton(onClick = onSettingsClick) { Icon(Icons.Outlined.Settings, "Settings", tint = MaterialTheme.colorScheme.onSurfaceVariant) }
+                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    IconButton(onClick = onProgressClick) {
+                        Text("📊", fontSize = 18.sp)
+                    }
+                    IconButton(onClick = onSettingsClick) {
+                        Icon(Icons.Outlined.Settings, "Settings", tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
             }
             Spacer(Modifier.height(32.dp))
             AnimatedContent(state, transitionSpec = { (fadeIn(tween(Motion.CardChangeDuration)) + slideInVertically(tween(Motion.CardChangeDuration)) { it / 8 }).togetherWith(fadeOut(tween(Motion.FadeDuration)) + slideOutVertically(tween(Motion.FadeDuration)) { -it / 8 }) }, label = "home-content") { current ->
@@ -67,10 +79,20 @@ fun HomeScreen(viewModel: HomeViewModel, onRoutineClick: (Category) -> Unit, onS
                         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                             HomeCard(selection, routine, timeFormat) { onRoutineClick(selection.category) }
                             if (current.activeCategories.size > 1) Text("+${current.activeCategories.size - 1} more ready when you are", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                            StreakTile(current.streakCount, bestStreak(current.completedDates), current.completedDates)
-                            QuietWeeklyHistoryRow(current.completedDates)
+                            StreakTile(
+                                streak = current.streakCount,
+                                bestStreak = bestStreak(current.completedDates),
+                                completedDates = current.completedDates,
+                                onClick = onProgressClick
+                            )
+                            QuietWeeklyHistoryRow(
+                                completedDates = current.completedDates,
+                                onClick = onProgressClick
+                            )
                         }
-                    } else EmptyState(current, timeFormat)
+                    } else {
+                        EmptyState(current, timeFormat, onProgressClick)
+                    }
                 }
             }
         }
@@ -186,7 +208,12 @@ private fun HomeCard(
 }
 
 @Composable
-private fun StreakTile(streak: Int, bestStreak: Int, completedDates: Set<LocalDate>) {
+private fun StreakTile(
+    streak: Int,
+    bestStreak: Int,
+    completedDates: Set<LocalDate>,
+    onClick: () -> Unit = {}
+) {
     if (streak == 0) return
 
     val accentColor = CategoryTheme.getAccentColor(Category.WORKOUT)
@@ -197,8 +224,11 @@ private fun StreakTile(streak: Int, bestStreak: Int, completedDates: Set<LocalDa
             .fillMaxWidth()
             .clip(shape)
             .background(Brush.horizontalGradient(listOf(accentColor, accentColor.copy(alpha = 0.6f))))
+            .clickable(onClick = onClick)
     } else {
-        Modifier.fillMaxWidth()
+        Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     }
     val contentColor = if (streak >= 7) MaterialTheme.colorScheme.onPrimary else accentColor
     
@@ -240,7 +270,10 @@ private fun StreakTile(streak: Int, bestStreak: Int, completedDates: Set<LocalDa
 }
 
 @Composable
-private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
+private fun QuietWeeklyHistoryRow(
+    completedDates: Set<LocalDate>,
+    onClick: () -> Unit = {}
+) {
     val today = LocalDate.now()
     val accentColor = CategoryTheme.getAccentColor(Category.WORKOUT)
     val daysOfWeek = (6 downTo 0).map { offset -> today.minusDays(offset.toLong()) }
@@ -249,7 +282,10 @@ private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
         shape = RoundedCornerShape(16.dp),
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)),
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp)
+            .clickable(onClick = onClick)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 12.dp),
@@ -288,15 +324,27 @@ private fun QuietWeeklyHistoryRow(completedDates: Set<LocalDate>) {
     }
 }
 
-@Composable private fun EmptyState(content: HomeUiState.Content, format: DateTimeFormatter) {
+@Composable private fun EmptyState(
+    content: HomeUiState.Content,
+    format: DateTimeFormatter,
+    onProgressClick: () -> Unit = {}
+) {
     Box(Modifier.fillMaxSize(), Alignment.Center) { Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Box(Modifier.size(56.dp).clip(CircleShape).border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape), Alignment.Center) { Box(Modifier.size(8.dp).clip(CircleShape).background(MaterialTheme.colorScheme.outlineVariant)) }
         Spacer(Modifier.height(24.dp)); Text("Nothing right now", style = MaterialTheme.typography.headlineMedium)
         Spacer(Modifier.height(8.dp)); Text(content.nextUpcoming?.let { "Next: ${it.category.displayName} at ${it.startTime.format(format).lowercase()}" } ?: "Set up category windows in Settings", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Spacer(Modifier.height(24.dp))
-        StreakTile(content.streakCount, bestStreak(content.completedDates), content.completedDates)
+        StreakTile(
+            streak = content.streakCount,
+            bestStreak = bestStreak(content.completedDates),
+            completedDates = content.completedDates,
+            onClick = onProgressClick
+        )
         if (content.streakCount > 0) Spacer(Modifier.height(8.dp))
-        QuietWeeklyHistoryRow(content.completedDates)
+        QuietWeeklyHistoryRow(
+            completedDates = content.completedDates,
+            onClick = onProgressClick
+        )
     } }
 }
 

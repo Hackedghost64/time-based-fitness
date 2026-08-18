@@ -42,7 +42,7 @@ data class TimeWindow(
      * For overnight windows, if [now] is after the end time, the start is today.
      * Otherwise, the start is yesterday (since the window started last night).
      */
-    fun startDateTime(now: LocalDateTime, zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
+    fun startDateTime(now: LocalDateTime, @Suppress("UNUSED_PARAMETER") zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
         val today = now.toLocalDate()
         val startToday = today.atTime(startTime)
 
@@ -64,7 +64,7 @@ data class TimeWindow(
      * For overnight windows, if [now] is before the start time, the end is today.
      * Otherwise, the end is tomorrow.
      */
-    fun endDateTime(now: LocalDateTime, zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
+    fun endDateTime(now: LocalDateTime, @Suppress("UNUSED_PARAMETER") zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime {
         val today = now.toLocalDate()
         val endToday = today.atTime(endTime)
 

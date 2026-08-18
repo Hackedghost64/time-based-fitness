@@ -29,6 +29,7 @@ object Screen {
     const val Home = "home"
     const val RoutineDetail = "routine/{category}"
     const val Settings = "settings"
+    const val Progress = "progress"
     const val PlanTransfer = "plan-transfer"
     const val AiPlan = "ai-plan"
 
@@ -71,6 +72,9 @@ fun AppNavGraph(
                 },
                 onSettingsClick = {
                     navController.navigate(Screen.Settings)
+                },
+                onProgressClick = {
+                    navController.navigate(Screen.Progress)
                 }
             )
         }
@@ -85,6 +89,14 @@ fun AppNavGraph(
                 onBackToHome = {
                     navController.popBackStack()
                 }
+            )
+        }
+
+        composable(Screen.Progress) {
+            val viewModel: com.timebasedfitness.app.ui.progress.ProgressViewModel = hiltViewModel()
+            com.timebasedfitness.app.ui.progress.ProgressScreen(
+                viewModel = viewModel,
+                onBack = { navController.popBackStack() }
             )
         }
 

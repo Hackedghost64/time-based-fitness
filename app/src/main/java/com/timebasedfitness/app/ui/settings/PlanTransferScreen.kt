@@ -2,6 +2,7 @@ package com.timebasedfitness.app.ui.settings
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -16,12 +17,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import com.timebasedfitness.app.ui.theme.AppSpacing
-
 import android.widget.Toast
-import androidx.compose.ui.platform.LocalContext
-
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.collectAsState
@@ -33,6 +34,7 @@ fun PlanTransferScreen(
     onShare: (String) -> Unit
 ) {
     val context = LocalContext.current
+    val clipboard = LocalClipboardManager.current
     val uiState by viewModel.uiState.collectAsState()
     var jsonText by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
@@ -132,10 +134,29 @@ fun PlanTransferScreen(
             }
         }
 
-        TextButton(
-            onClick = { viewModel.exportPlan(onShare) },
-            modifier = Modifier.fillMaxWidth()
-        ) { Text("Share current plan") }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            OutlinedButton(
+                onClick = {
+                    viewModel.exportPlan { json ->
+                        clipboard.setText(AnnotatedString(json))
+                        Toast.makeText(context, "Plan JSON copied to clipboard", Toast.LENGTH_SHORT).show()
+                    }
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Copy JSON")
+            }
+
+            Button(
+                onClick = { viewModel.exportPlan(onShare) },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Share Plan")
+            }
+        }
     }
 }
 

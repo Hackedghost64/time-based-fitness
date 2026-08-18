@@ -4,23 +4,28 @@ import android.content.Context
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
-import android.os.VibrationEffect.Composition
+import android.os.VibratorManager
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.timebasedfitness.app.data.content.RoutineContent
 import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.model.RoutineStep
+import com.timebasedfitness.app.data.prefs.OnboardingPrefsRepository
 import com.timebasedfitness.app.data.repository.CompletionRepository
 import com.timebasedfitness.app.data.repository.RoutineRepository
+import com.timebasedfitness.app.notifications.TimerAudioHelper
 import com.timebasedfitness.app.notifications.TimerNotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -51,14 +56,20 @@ object HapticPatterns {
 
 /** Helper class for haptic feedback */
 class HapticFeedback @Inject constructor(@ApplicationContext private val context: Context) {
-    private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+    private val vibrator: Vibrator? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val manager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as? VibratorManager
+        manager?.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        context.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+    }
 
     fun vibrate(effect: VibrationEffect) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            vibrator.vibrate(effect)
+            vibrator?.vibrate(effect)
         } else {
             @Suppress("DEPRECATION")
-            vibrator.vibrate(longArrayOf(0, 100), -1)
+            vibrator?.vibrate(longArrayOf(0, 100), -1)
         }
     }
 
@@ -79,15 +90,24 @@ data class ActiveTimer(
     val targetEndMillis: Long = 0L
 )
 
+data class RestTimer(
+    val remainingSeconds: Int,
+    val totalSeconds: Int,
+    val isRunning: Boolean,
+    val targetEndMillis: Long = 0L
+)
+
 data class RoutineDetailUiState(
     val category: Category? = null,
     val routineContent: RoutineContent? = null,
     val checkedSteps: Set<Int> = emptySet(),
     val activeTimer: ActiveTimer? = null,
+    val restTimer: RestTimer? = null,
     val pendingTimerStepIndex: Int? = null,
     val pendingTimerRemainingSeconds: Int = 0,
     val completedTimerIndex: Int? = null,
     val isAutoChainingEnabled: Boolean = false,
+    val isSoundEnabled: Boolean = true,
     val isCompleted: Boolean = false,
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
@@ -140,7 +160,9 @@ class RoutineDetailViewModel @Inject constructor(
     private val completionRepository: CompletionRepository,
     private val timerNotificationHelper: TimerNotificationHelper,
     private val templateRepository: TemplateRepository,
-    private val hapticFeedback: HapticFeedback
+    private val hapticFeedback: HapticFeedback,
+    private val timerAudioHelper: TimerAudioHelper,
+    private val prefsRepository: OnboardingPrefsRepository
 ) : ViewModel() {
 
     private val categoryParam: String? = savedStateHandle["category"]
@@ -149,6 +171,7 @@ class RoutineDetailViewModel @Inject constructor(
     val uiState: StateFlow<RoutineDetailUiState> = _uiState.asStateFlow()
 
     private var timerJob: Job? = null
+    private var restTimerJob: Job? = null
     private var restoredTimer = false
 
     init {
@@ -158,6 +181,13 @@ class RoutineDetailViewModel @Inject constructor(
         if (category != null) {
             val templates = templateRepository.getTemplatesForCategory(category)
             _uiState.update { it.copy(category = category, availableTemplates = templates) }
+            
+            viewModelScope.launch {
+                prefsRepository.timerSoundEnabled.collect { enabled ->
+                    _uiState.update { it.copy(isSoundEnabled = enabled) }
+                }
+            }
+
             viewModelScope.launch {
                 routineRepository.observe(category).collect { content ->
                     if (!_uiState.value.isEditing) {
@@ -176,6 +206,13 @@ class RoutineDetailViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    fun toggleSoundEnabled() {
+        viewModelScope.launch {
+            val next = !_uiState.value.isSoundEnabled
+            prefsRepository.setTimerSoundEnabled(next)
         }
     }
 
@@ -265,8 +302,9 @@ class RoutineDetailViewModel @Inject constructor(
 
         timerJob = viewModelScope.launch {
             var lastNotifiedRemaining = remaining
+            var lastTickedSecond = remaining
             while (true) {
-                delay(500L)
+                delay(250L)
                 val now = System.currentTimeMillis()
                 val rem = kotlin.math.max(0, ((targetEnd - now + 999) / 1000).toInt())
 
@@ -276,6 +314,13 @@ class RoutineDetailViewModel @Inject constructor(
                             state.copy(activeTimer = timer.copy(remainingSeconds = rem))
                         } else state
                     } ?: state
+                }
+
+                if (rem != lastTickedSecond) {
+                    if (rem in 1..3 && _uiState.value.isSoundEnabled) {
+                        timerAudioHelper.playCountdownTick()
+                    }
+                    lastTickedSecond = rem
                 }
 
                 if (rem == 0) {
@@ -289,7 +334,10 @@ class RoutineDetailViewModel @Inject constructor(
 
             // Auto-complete step when timer reaches zero!
             timerNotificationHelper.dismiss()
-            hapticFeedback.vibrateTimerComplete()  // Haptic feedback on timer completion
+            hapticFeedback.vibrateTimerComplete()
+            if (_uiState.value.isSoundEnabled) {
+                timerAudioHelper.playTimerCompleteTone()
+            }
             clearPersistedTimer()
             val newChecked = _uiState.value.checkedSteps + stepIndex
             _uiState.update { state ->
@@ -312,6 +360,80 @@ class RoutineDetailViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    // --- Inter-set Quick Rest Timer -------------------------------------------
+
+    fun startRestTimer(seconds: Int) {
+        restTimerJob?.cancel()
+        val targetEnd = System.currentTimeMillis() + (seconds * 1000L)
+        _uiState.update {
+            it.copy(
+                restTimer = RestTimer(
+                    remainingSeconds = seconds,
+                    totalSeconds = seconds,
+                    isRunning = true,
+                    targetEndMillis = targetEnd
+                )
+            )
+        }
+
+        restTimerJob = viewModelScope.launch {
+            var lastTickedSecond = seconds
+            while (true) {
+                delay(250L)
+                val now = System.currentTimeMillis()
+                val rem = kotlin.math.max(0, ((targetEnd - now + 999) / 1000).toInt())
+
+                _uiState.update { state ->
+                    state.restTimer?.let { timer ->
+                        if (timer.isRunning) state.copy(restTimer = timer.copy(remainingSeconds = rem)) else state
+                    } ?: state
+                }
+
+                if (rem != lastTickedSecond) {
+                    if (rem in 1..3 && _uiState.value.isSoundEnabled) {
+                        timerAudioHelper.playCountdownTick()
+                    }
+                    lastTickedSecond = rem
+                }
+
+                if (rem == 0) break
+            }
+
+            hapticFeedback.vibrateTimerComplete()
+            if (_uiState.value.isSoundEnabled) {
+                timerAudioHelper.playRestCompleteTone()
+            }
+            _uiState.update { it.copy(restTimer = null) }
+        }
+    }
+
+    fun pauseRestTimer() {
+        restTimerJob?.cancel()
+        _uiState.update { state ->
+            state.restTimer?.let { it.copy(isRunning = false) }?.let {
+                state.copy(restTimer = it)
+            } ?: state
+        }
+    }
+
+    fun resumeRestTimer() {
+        val current = _uiState.value.restTimer ?: return
+        if (current.remainingSeconds > 0) {
+            startRestTimer(current.remainingSeconds)
+        }
+    }
+
+    fun addRestSeconds(seconds: Int) {
+        val current = _uiState.value.restTimer
+        val newSeconds = (current?.remainingSeconds ?: 0) + seconds
+        startRestTimer(newSeconds)
+    }
+
+    fun cancelRestTimer() {
+        restTimerJob?.cancel()
+        _uiState.update { it.copy(restTimer = null) }
     }
 
     fun pauseTimer() {
@@ -345,8 +467,7 @@ class RoutineDetailViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         timerJob?.cancel()
-        // Keep a running timer's saved timestamp and notification available when the
-        // routine screen is recreated. A restored screen derives remaining time from it.
+        restTimerJob?.cancel()
     }
 
     fun markDone(onDone: () -> Unit) {

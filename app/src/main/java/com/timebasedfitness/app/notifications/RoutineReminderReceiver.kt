@@ -20,6 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import androidx.glance.appwidget.updateAll
 import java.time.LocalDate
 import java.time.LocalTime
 import javax.inject.Inject
@@ -76,6 +77,11 @@ class RoutineReminderReceiver : BroadcastReceiver() {
                 // Nudge cadence: bump the per-day counter so the next wake-up
                 // reschedules a fresh interval unless we've hit `maxPerWindow`.
                 scheduler.recordNudgeFire(category, today)
+
+                // Refresh home-screen widget on window event
+                runCatching {
+                    com.timebasedfitness.app.widget.NowRoutineWidget().updateAll(context)
+                }
             } finally {
                 pending.finish()
             }

@@ -27,4 +27,21 @@ object StreakCalculator {
 
         return streak
     }
+
+    fun calculateBestStreak(logs: List<CompletionLog>): Int {
+        if (logs.isEmpty()) return 0
+        val dates = logs.map { it.date }.toSet().sorted()
+        if (dates.isEmpty()) return 0
+        var best = 1
+        var current = 1
+        dates.zipWithNext().forEach { (previous, next) ->
+            if (next == previous.plusDays(1)) {
+                current++
+            } else {
+                current = 1
+            }
+            best = maxOf(best, current)
+        }
+        return best
+    }
 }
