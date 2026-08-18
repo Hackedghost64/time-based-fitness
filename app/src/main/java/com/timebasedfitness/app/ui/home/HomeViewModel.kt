@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 import java.time.LocalDate
 
@@ -45,6 +47,9 @@ class HomeViewModel @Inject constructor(
         Category.entries.zip(contents).toMap()
     }
 
+    // Track previous streak for milestone detection
+    private val previousStreakFlow = MutableStateFlow(0)
+
     val uiState: StateFlow<HomeUiState> = combine(
         categoryRepository.categorySelections,
         completionRepository.currentStreak,
@@ -54,6 +59,15 @@ class HomeViewModel @Inject constructor(
     ) { selections, streak, completedDates, routineMap, _ ->
         val now = LocalTime.now()
         val active = WindowMatcher.getMatchingCategories(now, selections)
+        
+        // Detect streak milestones (7, 30, 60, 90, 100, 365)
+        val prevStreak = previousStreakFlow.value
+        val isMilestone = streak in listOf(7, 30, 60, 90, 100, 365) && streak > prevStreak
+        if (isMilestone) {
+            // Could trigger haptic/notification here in v2
+            previousStreakFlow.value = streak
+        }
+        
         HomeUiState.Content(
             activeCategories = active,
             nextUpcoming = if (active.isEmpty()) WindowMatcher.getNextUpcoming(now, selections) else null,

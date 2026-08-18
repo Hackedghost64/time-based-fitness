@@ -8,6 +8,7 @@ import android.os.Build
 import com.timebasedfitness.app.data.model.Category
 import com.timebasedfitness.app.data.model.CategorySelection
 import com.timebasedfitness.app.data.repository.CompletionRepository
+import com.timebasedfitness.app.domain.TimeWindow
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -46,7 +47,7 @@ class NotificationScheduler @Inject constructor(
 
     /**
      * Schedule the next wake-up for [selection]. Pre-checks completion via the
-     * injected repository so a completed routine stops firing, and consults the
+     * injected repository so a completed routine stays "done", and consults the
      * daily nudge counter to cap re-fires at `policy.maxPerWindow`.
      */
     fun scheduleNextReminder(
@@ -130,7 +131,8 @@ class NotificationScheduler @Inject constructor(
         const val EXTRA_CATEGORY = "category"
 
         /**
-         * Compute the next reminder time. Pure, testable.
+         * Compute the next reminder time using canonical TimeWindow semantics.
+         * Pure, testable, and consistent with WindowMatcher.
          *
          * Behaviour:
          *  - Before today's window → fire at startTime.
@@ -148,25 +150,31 @@ class NotificationScheduler @Inject constructor(
             alreadyFiredCount: Int,
             isCompletedInWindow: Boolean
         ): Long {
-            val today = now.toLocalDate()
+            val window = TimeWindow(selection.startTime, selection.endTime)
             val nowTime = now.toLocalTime()
-            val startDt = today.atTime(selection.startTime)
-            val endDt = today.atTime(selection.endTime)
 
-            if (nowTime.isBefore(selection.startTime)) {
+            // Check if we're before the window starts
+            if (window.hasNotStarted(now)) {
+                val startDt = window.startDateTime(now, zoneId)
                 return startDt.atZone(zoneId).toInstant().toEpochMilli()
             }
 
-            if (isCompletedInWindow || !nowTime.isBefore(selection.endTime)) {
-                return startDt.plusDays(1).atZone(zoneId).toInstant().toEpochMilli()
+            // Check if window has ended or is completed
+            if (isCompletedInWindow || window.hasEnded(now)) {
+                val nextStart = window.nextOccurrence(now)
+                return nextStart.atZone(zoneId).toInstant().toEpochMilli()
             }
 
+            // Inside window - check cap
             if (alreadyFiredCount >= policy.maxPerWindow) {
-                return startDt.plusDays(1).atZone(zoneId).toInstant().toEpochMilli()
+                val nextStart = window.nextOccurrence(now)
+                return nextStart.atZone(zoneId).toInstant().toEpochMilli()
             }
 
+            // Fire interval from now, capped at window end
             val candidate = now.plusMinutes(policy.intervalMinutes.toLong())
-            val capped = if (candidate.toLocalTime().isAfter(selection.endTime)) endDt else candidate
+            val endDt = window.endDateTime(now, zoneId)
+            val capped = if (candidate.isAfter(endDt)) endDt else candidate
             return capped.atZone(zoneId).toInstant().toEpochMilli()
         }
 

@@ -1,5 +1,10 @@
 package com.timebasedfitness.app.ui.routine
 
+import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibrationEffect.Composition
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +15,7 @@ import com.timebasedfitness.app.data.repository.CompletionRepository
 import com.timebasedfitness.app.data.repository.RoutineRepository
 import com.timebasedfitness.app.notifications.TimerNotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +27,49 @@ import javax.inject.Inject
 
 import com.timebasedfitness.app.data.model.RoutineTemplate
 import com.timebasedfitness.app.data.model.TemplateRepository
+
+/** Haptic feedback patterns for timer completion and milestones */
+object HapticPatterns {
+    /** Gentle double-pulse for timer completion */
+    fun timerCompletePattern(): VibrationEffect {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            VibrationEffect.createPrecomposed(VibrationEffect.EFFECT_DOUBLE_CLICK)
+        } else {
+            VibrationEffect.createWaveform(longArrayOf(0, 100, 50, 100), -1)
+        }
+    }
+
+    /** Stronger celebration pattern for streak milestones */
+    fun milestoneCelebrationPattern(): VibrationEffect {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            VibrationEffect.createPrecomposed(VibrationEffect.EFFECT_HEAVY_CLICK)
+        } else {
+            VibrationEffect.createWaveform(longArrayOf(0, 150, 50, 150, 50, 150), -1)
+        }
+    }
+}
+
+/** Helper class for haptic feedback */
+class HapticFeedback @Inject constructor(@ApplicationContext private val context: Context) {
+    private val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+    fun vibrate(effect: VibrationEffect) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            vibrator.vibrate(effect)
+        } else {
+            @Suppress("DEPRECATION")
+            vibrator.vibrate(longArrayOf(0, 100), -1)
+        }
+    }
+
+    fun vibrateTimerComplete() {
+        vibrate(HapticPatterns.timerCompletePattern())
+    }
+
+    fun vibrateMilestone() {
+        vibrate(HapticPatterns.milestoneCelebrationPattern())
+    }
+}
 
 data class ActiveTimer(
     val stepIndex: Int,
@@ -90,7 +139,8 @@ class RoutineDetailViewModel @Inject constructor(
     private val routineRepository: RoutineRepository,
     private val completionRepository: CompletionRepository,
     private val timerNotificationHelper: TimerNotificationHelper,
-    private val templateRepository: TemplateRepository
+    private val templateRepository: TemplateRepository,
+    private val hapticFeedback: HapticFeedback
 ) : ViewModel() {
 
     private val categoryParam: String? = savedStateHandle["category"]
@@ -239,6 +289,7 @@ class RoutineDetailViewModel @Inject constructor(
 
             // Auto-complete step when timer reaches zero!
             timerNotificationHelper.dismiss()
+            hapticFeedback.vibrateTimerComplete()  // Haptic feedback on timer completion
             clearPersistedTimer()
             val newChecked = _uiState.value.checkedSteps + stepIndex
             _uiState.update { state ->

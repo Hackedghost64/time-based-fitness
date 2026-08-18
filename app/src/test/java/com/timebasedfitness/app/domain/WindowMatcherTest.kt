@@ -92,4 +92,41 @@ class WindowMatcherTest {
 
         assertEquals(Category.MORNING, next?.category)
     }
+
+    // Tests verifying TimeWindow integration consistency
+    @Test
+    fun `WindowMatcher uses TimeWindow internally - overnight consistency`() {
+        // This test verifies that WindowMatcher delegates to TimeWindow correctly
+        val overnightWindow = TimeWindow(LocalTime.of(22, 0), LocalTime.of(2, 0))
+        
+        // Both should agree on window containment
+        listOf(
+            LocalTime.of(23, 0),
+            LocalTime.of(0, 0),
+            LocalTime.of(1, 0),
+            LocalTime.of(22, 0),
+            LocalTime.of(2, 0)
+        ).forEach { time ->
+            val matcherResult = WindowMatcher.isInWindow(time, LocalTime.of(22, 0), LocalTime.of(2, 0))
+            val timeWindowResult = overnightWindow.contains(time)
+            assertEquals("Mismatch at $time", timeWindowResult, matcherResult)
+        }
+    }
+
+    @Test
+    fun `WindowMatcher uses TimeWindow internally - normal consistency`() {
+        val normalWindow = TimeWindow(LocalTime.of(6, 0), LocalTime.of(9, 0))
+        
+        listOf(
+            LocalTime.of(6, 0),
+            LocalTime.of(7, 30),
+            LocalTime.of(9, 0),
+            LocalTime.of(5, 59),
+            LocalTime.of(9, 1)
+        ).forEach { time ->
+            val matcherResult = WindowMatcher.isInWindow(time, LocalTime.of(6, 0), LocalTime.of(9, 0))
+            val timeWindowResult = normalWindow.contains(time)
+            assertEquals("Mismatch at $time", timeWindowResult, matcherResult)
+        }
+    }
 }

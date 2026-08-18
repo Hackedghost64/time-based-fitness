@@ -6,13 +6,7 @@ import java.time.LocalTime
 object WindowMatcher {
 
     fun isInWindow(now: LocalTime, startTime: LocalTime, endTime: LocalTime): Boolean {
-        return if (startTime <= endTime) {
-            // Standard daytime window (e.g. 06:00 to 09:00)
-            !now.isBefore(startTime) && !now.isAfter(endTime)
-        } else {
-            // Midnight-crossing window (e.g. 22:00 to 02:00)
-            !now.isBefore(startTime) || !now.isAfter(endTime)
-        }
+        return TimeWindow(startTime, endTime).contains(now)
     }
 
     fun getMatchingCategories(
