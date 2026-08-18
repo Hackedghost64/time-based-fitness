@@ -276,7 +276,10 @@ private fun QuietWeeklyHistoryRow(
 ) {
     val today = LocalDate.now()
     val accentColor = CategoryTheme.getAccentColor(Category.WORKOUT)
-    val daysOfWeek = (6 downTo 0).map { offset -> today.minusDays(offset.toLong()) }
+
+    // Always start from Monday of the current week (ISO week: Mon=1, Sun=7)
+    val mondayOfWeek = today.with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY))
+    val daysOfWeek = (0..6).map { offset -> mondayOfWeek.plusDays(offset.toLong()) }
 
     Surface(
         shape = RoundedCornerShape(16.dp),
@@ -295,34 +298,75 @@ private fun QuietWeeklyHistoryRow(
             daysOfWeek.forEach { date ->
                 val isCompleted = completedDates.contains(date)
                 val isToday = date == today
-                val dayLabel = date.dayOfWeek.name.take(2)
+                // Future days are greyed out
+                val isFuture = date.isAfter(today)
+                // Two-letter label: Mo, Tu, We, Th, Fr, Sa, Su
+                val dayLabel = when (date.dayOfWeek) {
+                    java.time.DayOfWeek.MONDAY    -> "Mo"
+                    java.time.DayOfWeek.TUESDAY   -> "Tu"
+                    java.time.DayOfWeek.WEDNESDAY -> "We"
+                    java.time.DayOfWeek.THURSDAY  -> "Th"
+                    java.time.DayOfWeek.FRIDAY    -> "Fr"
+                    java.time.DayOfWeek.SATURDAY  -> "Sa"
+                    java.time.DayOfWeek.SUNDAY    -> "Su"
+                    else -> date.dayOfWeek.name.take(2).lowercase().replaceFirstChar { it.uppercase() }
+                }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                    verticalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     Text(
                         text = dayLabel,
                         style = MaterialTheme.typography.labelSmall,
                         fontWeight = if (isToday) FontWeight.Bold else FontWeight.Normal,
-                        color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        color = when {
+                            isFuture -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
+                            isToday  -> MaterialTheme.colorScheme.primary
+                            else     -> MaterialTheme.colorScheme.onSurfaceVariant
+                        }
                     )
                     Box(
-                        modifier = Modifier
-                            .size(18.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(
-                                if (isCompleted && isToday) accentColor
-                                else if (isCompleted) MaterialTheme.colorScheme.primary
-                                else if (isToday) MaterialTheme.colorScheme.outline
-                                else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        modifier = Modifier.size(18.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (isCompleted) {
+                            // Filled rounded square for completed days
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(if (isToday) accentColor else MaterialTheme.colorScheme.primary)
                             )
-                    )
+                        } else if (isToday) {
+                            // Today without completion: accent outline ring
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(Color.Transparent)
+                                    .then(Modifier.border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(4.dp)))
+                            )
+                        } else {
+                            // Past or future: just a tiny dot, no filled box
+                            Box(
+                                modifier = Modifier
+                                    .size(5.dp)
+                                    .clip(CircleShape)
+                                    .background(
+                                        MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                            alpha = if (isFuture) 0.15f else 0.3f
+                                        )
+                                    )
+                            )
+                        }
+                    }
                 }
             }
         }
     }
 }
+
 
 @Composable private fun EmptyState(
     content: HomeUiState.Content,
